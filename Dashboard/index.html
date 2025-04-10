@@ -1,421 +1,677 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriSense Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2e7d32;
-            --secondary-color: #81c784;
-            --accent-color: #c8e6c9;
-            --warning-color: #ff9800;
-            --danger-color: #f44336;
-        }
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 20px;
-            padding-bottom: 40px;
-        }
-        .dashboard-header {
-            margin-bottom: 30px;
-        }
-        .dashboard-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            height: 100%;
-            border: none;
-        }
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
-        .card-header {
-            border-radius: 10px 10px 0 0 !important;
-            border-bottom: none;
-            font-weight: 600;
-        }
-        .temp-card .card-header {
-            background-color: rgba(46, 125, 50, 0.2);
-            color: var(--primary-color);
-        }
-        .humidity-card .card-header {
-            background-color: rgba(3, 169, 244, 0.2);
-            color: #0288d1;
-        }
-        .moisture-card .card-header {
-            background-color: rgba(121, 85, 72, 0.2);
-            color: #5d4037;
-        }
-        .current-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .temp-card .current-value {
-            color: var(--primary-color);
-        }
-        .humidity-card .current-value {
-            color: #0288d1;
-        }
-        .moisture-card .current-value {
-            color: #5d4037;
-        }
-        .unit {
-            font-size: 1.2rem;
-            font-weight: normal;
-            opacity: 0.7;
-        }
-        .status-indicator {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-        }
-        .status-connected {
-            background-color: rgba(46, 125, 50, 0.2);
-            color: var(--primary-color);
-        }
-        .status-disconnected, .status-error {
-            background-color: rgba(244, 67, 54, 0.2);
-            color: var(--danger-color);
-        }
-        .status-connecting {
-            background-color: rgba(255, 152, 0, 0.2);
-            color: var(--warning-color);
-        }
-        .status-indicator i {
-            margin-right: 5px;
-        }
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-        .data-history {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-        @media (max-width: 768px) {
-            .dashboard-card {
-                margin-bottom: 20px;
-            }
-            .current-value {
-                font-size: 2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrisense Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --agrisense-green: #2e7d32;
+      --agrisense-light: #60ad5e;
+      --agrisense-dark: #005005;
+    }
+    
+    body {
+      background-color: #f5f5f5;
+      padding-bottom: 2rem;
+    }
+    
+    .card {
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border: none;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s;
+    }
+    
+    .welcome-card {
+      border-radius: 1rem;
+      overflow: hidden;
+      border: none;
+      height: 100%;
+    }
+    
+    .sensor-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--agrisense-green);
+    }
+    
+    .sensor-unit {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    
+    .sensor-card {
+      text-align: center;
+      padding: 1.5rem;
+    }
+    
+    /* Connection status */
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    .status-online {
+      background-color: #198754;
+    }
+    
+    .status-offline {
+      background-color: #dc3545;
+    }
+    
+    .last-update {
+      font-size: 0.8rem;
+      color: #6c757d;
+      margin-top: 0.5rem;
+    }
+    
+    /* Custom color scheme */
+    .bg-agrisense {
+      background-color: var(--agrisense-green);
+    }
+    
+    .btn-agrisense {
+      background-color: var(--agrisense-green);
+      border-color: var(--agrisense-green);
+      color: white;
+    }
+    
+    .btn-agrisense:hover {
+      background-color: var(--agrisense-dark);
+      border-color: var(--agrisense-dark);
+      color: white;
+    }
+    
+    .btn-outline-agrisense {
+      color: var(--agrisense-green);
+      border-color: var(--agrisense-green);
+    }
+    
+    .btn-outline-agrisense:hover {
+      background-color: var(--agrisense-green);
+      color: white;
+    }
+    
+    .text-agrisense {
+      color: var(--agrisense-green);
+    }
+    
+    .chart-container {
+      height: 250px; 
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <div class="dashboard-header text-center">
-        <h1 class="display-4 fw-bold text-success">
-            <i class="fas fa-leaf me-2"></i>AgriSense Dashboard
-        </h1>
-        <p class="lead text-muted">Real-time monitoring of your agricultural environment</p>
-        <div class="mt-3 mb-4">
-        <span id="status" class="status-indicator status-connecting">
-          <i class="fas fa-spinner fa-spin"></i> Connecting...
-        </span>
-        </div>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-agrisense">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-flower1 me-2"></i>
+        Agrisense Dashboard
+      </a>
     </div>
+  </nav>
 
+  <!-- Main Content -->
+  <div class="container mt-4">
     <div class="row">
-        <!-- Temperature Card -->
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card temp-card">
-                <div class="card-header bg-light">
-                    <i class="fas fa-temperature-high me-2"></i>Temperature
-                </div>
-                <div class="card-body text-center">
-                    <div class="current-value" id="temperature">--<span class="unit">°C</span></div>
-                    <div class="chart-container">
-                        <canvas id="temperatureChart"></canvas>
-                    </div>
-                    <div class="data-history">
-                        Last 10 minutes of readings
-                    </div>
-                </div>
-            </div>
+      <div class="col-md-8 mx-auto text-center mb-4">
+        <h1 class="display-5 fw-bold">Agrisense Monitoring</h1>
+        <p class="lead">Real-time agricultural environment data</p>
+        <div class="d-flex justify-content-center align-items-center">
+          <div class="status-indicator status-offline" id="connectionStatus"></div>
+          <span id="connectionStatusText">Disconnected</span>
         </div>
-
-        <!-- Humidity Card -->
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card humidity-card">
-                <div class="card-header bg-light">
-                    <i class="fas fa-tint me-2"></i>Humidity
-                </div>
-                <div class="card-body text-center">
-                    <div class="current-value" id="humidity">--<span class="unit">%</span></div>
-                    <div class="chart-container">
-                        <canvas id="humidityChart"></canvas>
-                    </div>
-                    <div class="data-history">
-                        Last 10 minutes of readings
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Soil Moisture Card -->
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card moisture-card">
-                <div class="card-header bg-light">
-                    <i class="fas fa-water me-2"></i>Soil Moisture
-                </div>
-                <div class="card-body text-center">
-                    <div class="current-value" id="soilMoisture">--</div>
-                    <div class="chart-container">
-                        <canvas id="soilMoistureChart"></canvas>
-                    </div>
-                    <div class="data-history">
-                        Last 10 minutes of readings
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="last-update" id="lastUpdateTime">Last update: Never</div>
+      </div>
     </div>
-
-    <!-- System Information -->
+    
+    <!-- Sensor Cards -->
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body sensor-card">
+            <i class="bi bi-thermometer-half text-agrisense fs-1 mb-3"></i>
+            <h3>Temperature</h3>
+            <div class="sensor-value" id="temperature">--</div>
+            <div class="sensor-unit">°C</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body sensor-card">
+            <i class="bi bi-droplet-half text-agrisense fs-1 mb-3"></i>
+            <h3>Humidity</h3>
+            <div class="sensor-value" id="humidity">--</div>
+            <div class="sensor-unit">%</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body sensor-card">
+            <i class="bi bi-moisture text-agrisense fs-1 mb-3"></i>
+            <h3>Soil Moisture</h3>
+            <div class="sensor-value" id="soilMoisture">--</div>
+            <div class="sensor-unit">%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sensor History Graphs -->
     <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card dashboard-card">
-                <div class="card-header bg-light">
-                    <i class="fas fa-info-circle me-2"></i>System Information
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <p><strong>Last Updated:</strong> <span id="lastUpdated">--</span></p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Connection:</strong> <span id="connectionInfo">ws://192.168.76.140:5000</span></p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>Uptime:</strong> <span id="uptime">--</span></p>
-                        </div>
-                    </div>
-                </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Temperature History</h5>
+            <span class="badge bg-agrisense" id="temperatureStats">--</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="temperatureChart"></canvas>
             </div>
+          </div>
         </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Humidity History</h5>
+            <span class="badge bg-primary" id="humidityStats">--</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="humidityChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Soil Moisture History</h5>
+            <span class="badge bg-purple" id="soilMoistureStats">--</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="soilMoistureChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+    
+    <!-- Connection Control (Hidden but functional) -->
+    <div class="d-none">
+      <button id="reconnectButton" class="btn btn-sm btn-agrisense" onclick="connectWebSocket()">
+        Reconnect
+      </button>
+    </div>
+  </div>
 
-<!-- Bootstrap Bundle with Popper -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script>
-    // Initialize time tracking for uptime and last update timestamp
-    const startTime = new Date();
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Agrisense Dashboard</h5>
+          <p class="text-muted">Real-time agricultural monitoring system</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">Version 1.0.0</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  
+  <script>
+    // Global variables
+    let ws = null;
     let lastUpdateTime = null;
-
-    // Maximum data points for charts
-    const maxDataPoints = 20;
-    const temperatureData = Array(maxDataPoints).fill(null);
-    const humidityData = Array(maxDataPoints).fill(null);
-    const soilMoistureData = Array(maxDataPoints).fill(null);
-    const timeLabels = Array(maxDataPoints).fill('');
-
-    // Format time string
+    let reconnectTimer = null;
+    const reconnectInterval = 5000; // 5 seconds
+    
+    // WebSocket connection parameters
+    const wsHost = "192.168.76.140";
+    const wsPort = "5000";
+    
+    // Historical data storage
+    const maxDataPoints = 20; // Maximum number of data points to display
+    const historyData = {
+      temperature: {
+        values: [],
+        timestamps: [],
+        min: null,
+        max: null,
+        avg: null
+      },
+      humidity: {
+        values: [],
+        timestamps: [],
+        min: null,
+        max: null,
+        avg: null
+      },
+      soilMoisture: {
+        values: [],
+        timestamps: [],
+        min: null,
+        max: null,
+        avg: null
+      }
+    };
+    
+    // Chart objects
+    let temperatureChart;
+    let humidityChart;
+    let soilMoistureChart;
+    
+    // Format time for display
     function formatTime(date) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
-
-    // Update uptime display
-    function updateUptime() {
-        const now = new Date();
-        const diff = now - startTime;
-
-        const hours = Math.floor(diff / 3600000);
-        const minutes = Math.floor((diff % 3600000) / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-
-        document.getElementById('uptime').innerText =
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Calculate statistics for sensor data
+    function calculateStats(values) {
+      if (values.length === 0) return { min: null, max: null, avg: null };
+      
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const sum = values.reduce((a, b) => a + b, 0);
+      const avg = sum / values.length;
+      
+      return {
+        min: min.toFixed(1),
+        max: max.toFixed(1),
+        avg: avg.toFixed(1)
+      };
     }
-
-    // Initialize charts using Chart.js
-    const temperatureChart = new Chart(document.getElementById('temperatureChart'), {
+    
+    // Update statistics display
+    function updateStats() {
+      // Temperature stats
+      const tempStats = calculateStats(historyData.temperature.values);
+      document.getElementById('temperatureStats').textContent = 
+        `Avg: ${tempStats.avg}°C`;
+      
+      // Humidity stats
+      const humidityStats = calculateStats(historyData.humidity.values);
+      document.getElementById('humidityStats').textContent = 
+        `Avg: ${humidityStats.avg}%`;
+      
+      // Soil moisture stats
+      const soilMoistureStats = calculateStats(historyData.soilMoisture.values);
+      document.getElementById('soilMoistureStats').textContent = 
+        `Avg: ${soilMoistureStats.avg}%`;
+    }
+    
+    // Initialize charts
+    function initializeCharts() {
+      // Common chart configuration
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        elements: {
+          line: {
+            tension: 0.3 // Smooth curves
+          },
+          point: {
+            radius: 2,
+            hitRadius: 10,
+            hoverRadius: 4
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              autoSkip: true,
+              maxTicksLimit: 6,
+              maxRotation: 0,
+              callback: function(value, index, values) {
+                if (!this.chart.data.labels[index]) return '';
+                return formatTime(new Date(this.chart.data.labels[index]));
+              }
+            }
+          },
+          y: {
+            beginAtZero: false,
+            grid: {
+              drawBorder: false
+            },
+            ticks: {
+              padding: 5
+            }
+          }
+        },
+        interaction: {
+          mode: 'nearest',
+          intersect: false
+        },
+        animation: {
+          duration: 250
+        }
+      };
+      
+      // Temperature Chart
+      const temperatureCtx = document.getElementById('temperatureChart').getContext('2d');
+      temperatureChart = new Chart(temperatureCtx, {
         type: 'line',
         data: {
-            labels: timeLabels,
-            datasets: [{
-                label: 'Temperature (°C)',
-                data: temperatureData,
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(46, 125, 50, 0.1)',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: '#2e7d32',
-                tension: 0.3,
-                fill: true
-            }]
+          labels: [],
+          datasets: [{
+            label: 'Temperature (°C)',
+            data: [],
+            borderColor: 'rgba(46, 125, 50, 1)',
+            backgroundColor: 'rgba(46, 125, 50, 0.1)',
+            borderWidth: 2,
+            fill: true
+          }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
-                }
-            },
-            plugins: { legend: { display: false } },
-            animation: { duration: 500 }
+          ...JSON.parse(JSON.stringify(commonOptions)), // Deep clone
+          scales: {
+            ...JSON.parse(JSON.stringify(commonOptions.scales)),
+            y: {
+              ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
+              title: {
+                display: true,
+                text: '°C'
+              }
+            }
+          }
         }
-    });
-
-    const humidityChart = new Chart(document.getElementById('humidityChart'), {
+      });
+      
+      // Humidity Chart
+      const humidityCtx = document.getElementById('humidityChart').getContext('2d');
+      humidityChart = new Chart(humidityCtx, {
         type: 'line',
         data: {
-            labels: timeLabels,
-            datasets: [{
-                label: 'Humidity (%)',
-                data: humidityData,
-                borderColor: '#0288d1',
-                backgroundColor: 'rgba(3, 169, 244, 0.1)',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: '#0288d1',
-                tension: 0.3,
-                fill: true
-            }]
+          labels: [],
+          datasets: [{
+            label: 'Humidity (%)',
+            data: [],
+            borderColor: 'rgba(13, 110, 253, 1)',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            borderWidth: 2,
+            fill: true
+          }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
-                }
-            },
-            plugins: { legend: { display: false } },
-            animation: { duration: 500 }
+          ...JSON.parse(JSON.stringify(commonOptions)), // Deep clone
+          scales: {
+            ...JSON.parse(JSON.stringify(commonOptions.scales)),
+            y: {
+              ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
+              title: {
+                display: true,
+                text: '%'
+              },
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 20
+              }
+            }
+          }
         }
-    });
-
-    const soilMoistureChart = new Chart(document.getElementById('soilMoistureChart'), {
+      });
+      
+      // Soil Moisture Chart
+      const soilMoistureCtx = document.getElementById('soilMoistureChart').getContext('2d');
+      soilMoistureChart = new Chart(soilMoistureCtx, {
         type: 'line',
         data: {
-            labels: timeLabels,
-            datasets: [{
-                label: 'Soil Moisture',
-                data: soilMoistureData,
-                borderColor: '#5d4037',
-                backgroundColor: 'rgba(121, 85, 72, 0.1)',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: '#5d4037',
-                tension: 0.3,
-                fill: true
-            }]
+          labels: [],
+          datasets: [{
+            label: 'Soil Moisture (%)',
+            data: [],
+            borderColor: 'rgba(123, 31, 162, 1)',
+            backgroundColor: 'rgba(123, 31, 162, 0.1)',
+            borderWidth: 2,
+            fill: true
+          }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
-                },
-                x: {
-                    grid: { display: false },
-                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
-                }
-            },
-            plugins: { legend: { display: false } },
-            animation: { duration: 500 }
+          ...JSON.parse(JSON.stringify(commonOptions)), // Deep clone
+          scales: {
+            ...JSON.parse(JSON.stringify(commonOptions.scales)),
+            y: {
+              ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
+              title: {
+                display: true,
+                text: '%'
+              },
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 20
+              }
+            }
+          }
         }
-    });
-
-    // Function to update the charts with new data
-    function updateCharts(temperature, humidity, soilMoisture) {
-        const now = new Date();
-        const timeStr = formatTime(now);
-
-        temperatureData.push(temperature);
-        humidityData.push(humidity);
-        soilMoistureData.push(soilMoisture);
-        timeLabels.push(timeStr);
-
-        if (temperatureData.length > maxDataPoints) {
-            temperatureData.shift();
-            humidityData.shift();
-            soilMoistureData.shift();
-            timeLabels.shift();
-        }
-
-        temperatureChart.data.labels = timeLabels;
-        temperatureChart.data.datasets[0].data = temperatureData;
-        temperatureChart.update();
-
-        humidityChart.data.labels = timeLabels;
-        humidityChart.data.datasets[0].data = humidityData;
-        humidityChart.update();
-
-        soilMoistureChart.data.labels = timeLabels;
-        soilMoistureChart.data.datasets[0].data = soilMoistureData;
-        soilMoistureChart.update();
+      });
     }
-
+    
+    // Update charts with new sensor data
+    function updateCharts(data, timestamp) {
+      // Format timestamp for display
+      const timeString = timestamp.toISOString();
+      
+      // Update temperature data
+      historyData.temperature.values.push(parseFloat(data.temperature));
+      historyData.temperature.timestamps.push(timeString);
+      
+      // Update humidity data
+      historyData.humidity.values.push(parseFloat(data.humidity));
+      historyData.humidity.timestamps.push(timeString);
+      
+      // Update soil moisture data
+      historyData.soilMoisture.values.push(parseFloat(data.soilMoisture));
+      historyData.soilMoisture.timestamps.push(timeString);
+      
+      // Limit array size by removing oldest data if needed
+      if (historyData.temperature.values.length > maxDataPoints) {
+        historyData.temperature.values.shift();
+        historyData.temperature.timestamps.shift();
+        historyData.humidity.values.shift();
+        historyData.humidity.timestamps.shift();
+        historyData.soilMoisture.values.shift();
+        historyData.soilMoisture.timestamps.shift();
+      }
+      
+      // Update temperature chart
+      temperatureChart.data.labels = historyData.temperature.timestamps;
+      temperatureChart.data.datasets[0].data = historyData.temperature.values;
+      temperatureChart.update('none'); // Update without animation for better performance
+      
+      // Update humidity chart
+      humidityChart.data.labels = historyData.humidity.timestamps;
+      humidityChart.data.datasets[0].data = historyData.humidity.values;
+      humidityChart.update('none');
+      
+      // Update soil moisture chart
+      soilMoistureChart.data.labels = historyData.soilMoisture.timestamps;
+      soilMoistureChart.data.datasets[0].data = historyData.soilMoisture.values;
+      soilMoistureChart.update('none');
+      
+      // Update statistics
+      updateStats();
+    }
+    
     // Connect to the WebSocket server
-    const socket = new WebSocket("ws://192.168.76.140:5000");
-
-    socket.onopen = function() {
-        document.getElementById("status").className = "status-indicator status-connected";
-        document.getElementById("status").innerHTML = '<i class="fas fa-check-circle"></i> Connected';
-    };
-
-    socket.onmessage = function(event) {
-        try {
+    function connectWebSocket() {
+      // Clear any existing reconnect timer
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+      
+      // Close any existing connection
+      if (ws) {
+        ws.close();
+      }
+      
+      // Update status to connecting
+      document.getElementById('connectionStatus').className = "status-indicator status-offline";
+      document.getElementById('connectionStatusText').textContent = "Connecting...";
+      
+      // Create websocket connection
+      try {
+        ws = new WebSocket(`ws://${wsHost}:${wsPort}`);
+        
+        ws.onopen = function() {
+          console.log("WebSocket connected");
+          document.getElementById('connectionStatus').className = "status-indicator status-online";
+          document.getElementById('connectionStatusText').textContent = "Connected";
+        };
+        
+        ws.onmessage = function(event) {
+          try {
+            // Parse the received JSON data
             const data = JSON.parse(event.data);
-
-            // Update current sensor values on the dashboard
-            document.getElementById("temperature").innerHTML = data.temperature.toFixed(2) + '<span class="unit">°C</span>';
-            document.getElementById("humidity").innerHTML = data.humidity.toFixed(2) + '<span class="unit">%</span>';
-            document.getElementById("soilMoisture").innerHTML = data.soilMoisture;
-
-            // Update last updated time
+            
+            // Convert soil moisture to percentage format (e.g., 3214 -> 32.14%)
+            const rawSoilMoisture = parseFloat(data.soilMoisture);
+            const soilMoisturePercentage = (rawSoilMoisture / 100).toFixed(2);
+            
+            // Update sensor displays
+            document.getElementById("temperature").textContent = data.temperature;
+            document.getElementById("humidity").textContent = data.humidity;
+            document.getElementById("soilMoisture").textContent = soilMoisturePercentage;
+            
+            // Update the last update time
             lastUpdateTime = new Date();
-            document.getElementById("lastUpdated").innerText = formatTime(lastUpdateTime);
-
-            // Update charts with new data
-            updateCharts(data.temperature, data.humidity, data.soilMoisture);
-        } catch (error) {
-            console.error("JSON Parse Error:", error);
-        }
-    };
-
-    socket.onerror = function() {
-        document.getElementById("status").className = "status-indicator status-error";
-        document.getElementById("status").innerHTML = '<i class="fas fa-exclamation-triangle"></i> WebSocket Error';
-    };
-
-    socket.onclose = function() {
-        document.getElementById("status").className = "status-indicator status-disconnected";
-        document.getElementById("status").innerHTML = '<i class="fas fa-times-circle"></i> Disconnected';
-    };
-
-    // Update uptime every second
-    setInterval(updateUptime, 1000);
-</script>
+            document.getElementById('lastUpdateTime').textContent = `Last update: ${formatTime(lastUpdateTime)}`;
+            
+            // Create a modified data object with the converted soil moisture
+            const processedData = {
+              temperature: data.temperature,
+              humidity: data.humidity,
+              soilMoisture: soilMoisturePercentage
+            };
+            
+            // Update charts with processed data
+            updateCharts(processedData, lastUpdateTime);
+            
+          } catch (error) {
+            console.error("Error processing data:", error);
+          }
+        };
+        
+        ws.onerror = function(event) {
+          console.error("WebSocket error occurred");
+          document.getElementById('connectionStatus').className = "status-indicator status-offline";
+          document.getElementById('connectionStatusText').textContent = "Error";
+        };
+        
+        ws.onclose = function() {
+          console.log("WebSocket connection closed");
+          document.getElementById('connectionStatus').className = "status-indicator status-offline";
+          document.getElementById('connectionStatusText').textContent = "Disconnected";
+          
+          // Schedule reconnection
+          reconnectTimer = setTimeout(function() {
+            console.log("Attempting to reconnect...");
+            connectWebSocket();
+          }, reconnectInterval);
+        };
+        
+      } catch (error) {
+        console.error("Error creating WebSocket:", error);
+        document.getElementById('connectionStatus').className = "status-indicator status-offline";
+        document.getElementById('connectionStatusText').textContent = "Failed";
+        
+        // Schedule reconnection
+        reconnectTimer = setTimeout(function() {
+          console.log("Attempting to reconnect after error...");
+          connectWebSocket();
+        }, reconnectInterval);
+      }
+    }
+    
+    // Generate sample data for testing UI when no connection
+    function generateSampleData() {
+      // Sample temperature between 18 and 28
+      const temperature = (Math.random() * 10 + 18).toFixed(1);
+      // Sample humidity between 40 and 80
+      const humidity = (Math.random() * 40 + 40).toFixed(1);
+      // Sample soil moisture as raw value between 3000 and 7000
+      const rawSoilMoisture = Math.floor(Math.random() * 4000 + 3000);
+      // Convert to percentage format for display
+      const soilMoisturePercentage = (rawSoilMoisture / 100).toFixed(2);
+      
+      return {
+        temperature: temperature,
+        humidity: humidity,
+        soilMoisture: soilMoisturePercentage
+      };
+    }
+    
+    // Test the UI with generated data
+    function testUI() {
+      const data = generateSampleData();
+      
+      // Update sensor displays
+      document.getElementById("temperature").textContent = data.temperature;
+      document.getElementById("humidity").textContent = data.humidity;
+      document.getElementById("soilMoisture").textContent = data.soilMoisture;
+      
+      // Update the last update time
+      lastUpdateTime = new Date();
+      document.getElementById('lastUpdateTime').textContent = `Last update: ${formatTime(lastUpdateTime)}`;
+      
+      // Update charts with new data
+      updateCharts(data, lastUpdateTime);
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Initializing dashboard...");
+      
+      // Initialize charts
+      initializeCharts();
+      
+      // Populate initial test data to ensure charts display properly
+      for (let i = 0; i < 5; i++) {
+        const time = new Date(Date.now() - (5-i) * 5000);
+        updateCharts(generateSampleData(), time);
+      }
+      
+      // Connect to WebSocket
+      console.log("Connecting to WebSocket server...");
+      connectWebSocket();
+    });
+  </script>
 </body>
 </html>
