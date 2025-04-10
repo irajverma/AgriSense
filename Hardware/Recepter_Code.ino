@@ -20,17 +20,15 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     if (i < 5) Serial.print(":");
   }
   Serial.println();
-  
-  Serial.print("Temperature: ");
+
+  // Convert data to JSON format
+  Serial.print("{\"temperature\":");
   Serial.print(sensorData.temperature);
-  Serial.println(" °C");
-  
-  Serial.print("Humidity: ");
+  Serial.print(", \"humidity\":");
   Serial.print(sensorData.humidity);
-  Serial.println(" %");
-  
-  Serial.print("Soil Moisture: ");
-  Serial.println(sensorData.soilMoisture);
+  Serial.print(", \"soilMoisture\":");
+  Serial.print(sensorData.soilMoisture);
+  Serial.println("}");
 }
 
 void setup() {
