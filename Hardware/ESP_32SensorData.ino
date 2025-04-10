@@ -2,14 +2,13 @@
 #include <esp_now.h>
 #include <DHT.h>
 
-// ----- Sensor and Pin Settings -----
-#define DHTPIN 4              // GPIO pin connected to DHT11 data pin
-#define DHTTYPE DHT11         // Define sensor type: DHT11
-#define SOIL_MOISTURE_PIN 34  // GPIO34 (ADC1) for the soil moisture sensor
+#define DHTPIN 4              
+#define DHTTYPE DHT11         
+#define SOIL_MOISTURE_PIN 34  
 
 DHT dht(DHTPIN, DHTTYPE);
 
-// ----- Data Structure for ESP‑NOW Communication -----
+// ----- Data Structure -----
 typedef struct struct_message {
   float temperature;
   float humidity;
@@ -18,7 +17,7 @@ typedef struct struct_message {
 
 struct_message sensorData;
 
-// ----- Updated with the Receiver's MAC Address (ESP8266) -----
+// ----- Receiver's MAC Address -----
 uint8_t receiverMAC[] = {0x80, 0x64, 0x6F, 0xAD, 0x31, 0xE7};
 
 // Callback function for ESP-NOW data send status
@@ -29,60 +28,54 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 
 void setup() {
   Serial.begin(115200);
-
-  // Set ESP32 as a Wi-Fi Station
+  
+  // ✅ 1. Set ESP32 to Wi-Fi Station mode (VERY IMPORTANT)
   WiFi.mode(WIFI_STA);
+  WiFi.disconnect(); // Ensure it's not connected to any network
 
-  // Initialize ESP‑NOW
+  // ✅ 2. Initialize ESP-NOW
   if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP‑NOW");
+    Serial.println("Error initializing ESP-NOW");
     return;
   }
-
-  // Register callback for sending data
+  
+  // ✅ 3. Register callback
   esp_now_register_send_cb(OnDataSent);
 
-  // Add the receiver peer
+  // ✅ 4. Prepare Peer Info
   esp_now_peer_info_t peerInfo;
+  memset(&peerInfo, 0, sizeof(peerInfo));  // Clear previous data
   memcpy(peerInfo.peer_addr, receiverMAC, 6);
-  peerInfo.channel = 0;
-  peerInfo.encrypt = false;
+  peerInfo.channel = 0;  
+  peerInfo.encrypt = false;  
 
+  // ✅ 5. Add Peer to ESP-NOW
   if (esp_now_add_peer(&peerInfo) != ESP_OK) {
     Serial.println("Failed to add peer");
     return;
   }
 
-  // Initialize the DHT sensor
   dht.begin();
-  
   Serial.println("ESP32 ESP-NOW Transmitter Setup Complete.");
 }
 
 void loop() {
-  // Read sensor values
   sensorData.temperature = dht.readTemperature();
-  sensorData.humidity    = dht.readHumidity();
+  sensorData.humidity = dht.readHumidity();
   sensorData.soilMoisture = analogRead(SOIL_MOISTURE_PIN);
 
-  
- 
-    Serial.print("Sending data -> Temp: ");
+  if (!isnan(sensorData.temperature) && !isnan(sensorData.humidity)) {
+    Serial.print("Sending -> Temp: ");
     Serial.print(sensorData.temperature);
     Serial.print(" C, Humidity: ");
     Serial.print(sensorData.humidity);
     Serial.print(" %, Soil Moisture: ");
     Serial.println(sensorData.soilMoisture);
 
-    // Send data via ESP‑NOW
+    // ✅ 6. Send ESP-NOW Data
     esp_err_t result = esp_now_send(receiverMAC, (uint8_t *)&sensorData, sizeof(sensorData));
-    if (result == ESP_OK) {
-      Serial.println("ESP-NOW message sent successfully");
-    } else {
-      Serial.println("Error sending ESP-NOW message");
-    }
-  
+    Serial.println(result == ESP_OK ? "ESP-NOW message sent successfully" : "Error sending ESP-NOW message");
+  }
 
-  
-  delay(10000);
+  delay(5000);
 }
