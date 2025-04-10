@@ -19,7 +19,7 @@ typedef struct SensorData {
 SensorData sensorData;
 
 // MAC Address of the ESP32 receiver
-uint8_t receiverMac[] = {0x24, 0x6F, 0x28, 0xXX, 0xXX, 0xXX}; // Refer other code in zip to check for MAC Adress
+uint8_t receiverMac[] = {0x80, 0x64, 0x6F, 0xAD, 0x31, 0xE7}; // Refer other code in repo to check for MAC Adress - 80:64:6F:AD:31:E7
 
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
