@@ -1,71 +1,88 @@
-// This Code will take sensor data from the EPS32 and send it to the ESP8266 over ESP_NOW protocol
 #include <WiFi.h>
 #include <esp_now.h>
 #include <DHT.h>
 
-#define DHTPIN 4         // DHT11 data pin connected to GPIO 4
-#define DHTTYPE DHT11
-#define SOIL_MOISTURE_PIN 34  // Soil moisture sensor connected to GPIO 34 (analog input)
+// ----- Sensor and Pin Settings -----
+#define DHTPIN 4              // GPIO pin connected to DHT11 data pin
+#define DHTTYPE DHT11         // Define sensor type: DHT11
+#define SOIL_MOISTURE_PIN 34  // GPIO34 (ADC1) for the soil moisture sensor
 
 DHT dht(DHTPIN, DHTTYPE);
 
-// Structure to hold sensor data
-typedef struct SensorData {
-    float temperature;
-    float humidity;
-    int soilMoisture;
-} SensorData;
+// ----- Data Structure for ESP‑NOW Communication -----
+typedef struct struct_message {
+  float temperature;
+  float humidity;
+  int soilMoisture;
+} struct_message;
 
-SensorData sensorData;
+struct_message sensorData;
 
-// MAC Address of the ESP32 receiver
-uint8_t receiverMac[] = {0x80, 0x64, 0x6F, 0xAD, 0x31, 0xE7}; // Refer other code in repo to check for MAC Adress - 80:64:6F:AD:31:E7
+// ----- Updated with the Receiver's MAC Address (ESP8266) -----
+uint8_t receiverMAC[] = {0x80, 0x64, 0x6F, 0xAD, 0x31, 0xE7};
 
-// Callback when data is sent
+// Callback function for ESP-NOW data send status
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-    Serial.print("Send Status: ");
-    Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Successfuly sent to PROCESS MODULE" : "Fail");
+  Serial.print("Send Status: ");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
 }
 
 void setup() {
-    Serial.begin(115200);
-    dht.begin();
+  Serial.begin(115200);
 
-    WiFi.mode(WIFI_STA);
-    if (esp_now_init() != ESP_OK) {
-        Serial.println("ESP-NOW Initialization Failed!");
-        return;
-    }
+  // Set ESP32 as a Wi-Fi Station
+  WiFi.mode(WIFI_STA);
 
-    esp_now_register_send_cb(OnDataSent);
-    
-    esp_now_peer_info_t peerInfo;
-    memcpy(peerInfo.peer_addr, receiverMac, 6);
-    peerInfo.channel = 0;
-    peerInfo.encrypt = false;
+  // Initialize ESP‑NOW
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("Error initializing ESP‑NOW");
+    return;
+  }
 
-    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
-        Serial.println("Failed to add peer");
-        return;
-    }
+  // Register callback for sending data
+  esp_now_register_send_cb(OnDataSent);
+
+  // Add the receiver peer
+  esp_now_peer_info_t peerInfo;
+  memcpy(peerInfo.peer_addr, receiverMAC, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("Failed to add peer");
+    return;
+  }
+
+  // Initialize the DHT sensor
+  dht.begin();
+  
+  Serial.println("ESP32 ESP-NOW Transmitter Setup Complete.");
 }
 
 void loop() {
-    sensorData.temperature = dht.readTemperature();
-    sensorData.humidity = dht.readHumidity();
-    sensorData.soilMoisture = analogRead(SOIL_MOISTURE_PIN);
+  // Read sensor values
+  sensorData.temperature = dht.readTemperature();
+  sensorData.humidity    = dht.readHumidity();
+  sensorData.soilMoisture = analogRead(SOIL_MOISTURE_PIN);
 
-    Serial.print("Temperature: "); Serial.print(sensorData.temperature); Serial.print(" °C");
-    Serial.print(" Humidity: "); Serial.print(sensorData.humidity); Serial.print(" %");
-    Serial.print(" Soil Moisture: "); Serial.println(sensorData.soilMoisture);
+  
+ 
+    Serial.print("Sending data -> Temp: ");
+    Serial.print(sensorData.temperature);
+    Serial.print(" C, Humidity: ");
+    Serial.print(sensorData.humidity);
+    Serial.print(" %, Soil Moisture: ");
+    Serial.println(sensorData.soilMoisture);
 
-    esp_err_t result = esp_now_send(receiverMac, (uint8_t *)&sensorData, sizeof(sensorData));
-    
+    // Send data via ESP‑NOW
+    esp_err_t result = esp_now_send(receiverMAC, (uint8_t *)&sensorData, sizeof(sensorData));
     if (result == ESP_OK) {
-        Serial.println("Data sent successfully");
+      Serial.println("ESP-NOW message sent successfully");
     } else {
-        Serial.println("Failed to send data");
+      Serial.println("Error sending ESP-NOW message");
     }
+  
 
-    delay(2000); // Send data every 2 seconds
+  
+  delay(10000);
 }
