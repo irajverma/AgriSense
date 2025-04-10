@@ -3,2921 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESP32 IoT Dashboard</title>
+    <title>AgriSense Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #0d6efd;
-            --primary-dark: #0a58ca;
-            --secondary: #6c757d;
-            --success: #198754;
-            --info: #0dcaf0;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --light: #f8f9fa;
-            --dark: #212529;
+            --primary-color: #2e7d32;
+            --secondary-color: #81c784;
+            --accent-color: #c8e6c9;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
         }
-        
         body {
-            background-color: #f5f5f5;
-            padding-bottom: 2rem;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 20px;
+            padding-bottom: 40px;
         }
-        
-        .header-logo {
-            max-height: 40px;
-            margin-right: 10px;
+        .dashboard-header {
+            margin-bottom: 30px;
         }
-        
-        .card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border: none;
-            margin-bottom: 1.5rem;
-            transition: transform 0.2s;
-        }
-        
-        .welcome-card {
-            border-radius: 1rem;
-            overflow: hidden;
-            border: none;
+        .dashboard-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
             height: 100%;
-            cursor: pointer;
+            border: none;
         }
-        
-        .welcome-card:hover {
+        .dashboard-card:hover {
             transform: translateY(-5px);
         }
-        
-        .welcome-card .card-body {
-            padding: 2rem 1.5rem;
-        }
-        
-        .welcome-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-        
-        .sensor-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
-        .sensor-unit {
-            font-size: 1rem;
-            color: var(--secondary);
-        }
-        
-        .chart-container {
-            width: 100%;
-            height: 250px;
-            margin-top: 1rem;
-        }
-        
-        .message-list {
-            max-height: 350px;
-            overflow-y: auto;
-        }
-        
-        .message {
-            border-left: 3px solid var(--primary);
-            padding: 0.5rem 1rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .message-urgent {
-            border-left-color: var(--danger);
-        }
-        
-        .message-high {
-            border-left-color: var(--warning);
-        }
-        
-        .message-time {
-            font-size: 0.75rem;
-            color: var(--secondary);
-        }
-        
-        .nav-link.active {
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            border-bottom: none;
             font-weight: 600;
         }
-        
-        .sensor-card {
-            text-align: center;
-            padding: 1.5rem;
+        .temp-card .card-header {
+            background-color: rgba(46, 125, 50, 0.2);
+            color: var(--primary-color);
         }
-        
-        .page-header {
-            padding: 2rem 0 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+        .humidity-card .card-header {
+            background-color: rgba(3, 169, 244, 0.2);
+            color: #0288d1;
         }
-        
-        .prediction-card {
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+        .moisture-card .card-header {
+            background-color: rgba(121, 85, 72, 0.2);
+            color: #5d4037;
         }
-        
-        .prediction-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin: 0.5rem 0;
+        .current-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
         }
-        
-        .faq-item {
-            margin-bottom: 1.5rem;
+        .temp-card .current-value {
+            color: var(--primary-color);
         }
-        
-        .faq-item h5 {
-            margin-bottom: 0.5rem;
-            color: var(--dark);
+        .humidity-card .current-value {
+            color: #0288d1;
         }
-        
-        .docs-section {
-            margin-bottom: 1.5rem;
+        .moisture-card .current-value {
+            color: #5d4037;
         }
-        
-        .loader-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
+        .unit {
+            font-size: 1.2rem;
+            font-weight: normal;
+            opacity: 0.7;
         }
-        
-        /* Custom toggle switch for dark mode */
-        .form-check-input:checked {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        /* Dashboard sidebar */
-        @media (min-width: 992px) {
-            .dashboard-sidebar {
-                position: sticky;
-                top: 20px;
-                height: calc(100vh - 40px);
-                overflow-y: auto;
-            }
-        }
-        
-        /* Animation */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .spinner-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            text-align: center;
-        }
-
         .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-connected {
+            background-color: rgba(46, 125, 50, 0.2);
+            color: var(--primary-color);
+        }
+        .status-disconnected, .status-error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+        .status-connecting {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning-color);
+        }
+        .status-indicator i {
             margin-right: 5px;
         }
-
-        .status-online {
-            background-color: var(--success);
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
         }
-
-        .status-offline {
-            background-color: var(--danger);
+        .data-history {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
         }
-
-        .status-warning {
-            background-color: var(--warning);
-        }
-
-        .last-update {
-            font-size: 0.8rem;
-            color: var(--secondary);
-            margin-top: 0.5rem;
-        }
-
-        .connection-badge {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Data parameter highlight */
-        .param-highlight {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            background-color: rgba(13, 110, 253, 0.1);
-            color: var(--primary);
-            border-radius: 0.25rem;
-            font-weight: 500;
-            margin: 0 0.2rem;
+        @media (max-width: 768px) {
+            .dashboard-card {
+                margin-bottom: 20px;
+            }
+            .current-value {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner-container">
-            <div class="spinner-border text-primary mb-3" role="status"></div>
-            <div>Loading dashboard...</div>
-            <div class="text-muted small mt-2">Connecting to WebSocket server</div>
+<div class="container">
+    <div class="dashboard-header text-center">
+        <h1 class="display-4 fw-bold text-success">
+            <i class="fas fa-leaf me-2"></i>AgriSense Dashboard
+        </h1>
+        <p class="lead text-muted">Real-time monitoring of your agricultural environment</p>
+        <div class="mt-3 mb-4">
+        <span id="status" class="status-indicator status-connecting">
+          <i class="fas fa-spinner fa-spin"></i> Connecting...
+        </span>
         </div>
     </div>
 
-    <!-- Connection Status Badge -->
-    <div class="connection-badge bg-success text-white d-none" id="connectionBadge">
-        <i class="bi bi-wifi"></i> Connected
+    <div class="row">
+        <!-- Temperature Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card temp-card">
+                <div class="card-header bg-light">
+                    <i class="fas fa-temperature-high me-2"></i>Temperature
+                </div>
+                <div class="card-body text-center">
+                    <div class="current-value" id="temperature">--<span class="unit">°C</span></div>
+                    <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                    <div class="data-history">
+                        Last 10 minutes of readings
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Humidity Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card humidity-card">
+                <div class="card-header bg-light">
+                    <i class="fas fa-tint me-2"></i>Humidity
+                </div>
+                <div class="card-body text-center">
+                    <div class="current-value" id="humidity">--<span class="unit">%</span></div>
+                    <div class="chart-container">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                    <div class="data-history">
+                        Last 10 minutes of readings
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Soil Moisture Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card dashboard-card moisture-card">
+                <div class="card-header bg-light">
+                    <i class="fas fa-water me-2"></i>Soil Moisture
+                </div>
+                <div class="card-body text-center">
+                    <div class="current-value" id="soilMoisture">--</div>
+                    <div class="chart-container">
+                        <canvas id="soilMoistureChart"></canvas>
+                    </div>
+                    <div class="data-history">
+                        Last 10 minutes of readings
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#" onclick="showSection('welcome')">
-                <i class="bi bi-cpu me-2"></i>
-                ESP32 IoT Dashboard
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" onclick="showSection('welcome')">
-                            <i class="bi bi-house-door"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('sensor-data')">
-                            <i class="bi bi-graph-up"></i> Sensor Data
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('predictive-analysis')">
-                            <i class="bi bi-bar-chart"></i> Analysis
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('messages')">
-                            <i class="bi bi-chat-dots"></i> Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('help-contact')">
-                            <i class="bi bi-question-circle"></i> Help
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mt-4">
-        <!-- Welcome Page -->
-        <div id="welcome" class="section fade-in">
-            <div class="row">
-                <div class="col-md-8 mx-auto text-center mb-4">
-                    <h1 class="display-5 fw-bold mb-3">Welcome to Your IoT Control Center</h1>
-                    <p class="lead">Monitor, analyze, and control your IoT ecosystem powered by ESP32</p>
-                    <div class="d-flex justify-content-center align-items-center">
-                        <div class="status-indicator status-online" id="systemStatusIndicator"></div>
-                        <span id="systemStatusText">System Online</span>
-                    </div>
-                    <div class="last-update" id="lastUpdateTime">Last update: Connecting...</div>
+    <!-- System Information -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card dashboard-card">
+                <div class="card-header bg-light">
+                    <i class="fas fa-info-circle me-2"></i>System Information
                 </div>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="card welcome-card text-center h-100" onclick="showSection('sensor-data')">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <i class="bi bi-graph-up welcome-icon"></i>
-                            <h4 class="card-title">Real-Time Sensor Data</h4>
-                            <p class="card-text text-muted">Monitor your sensor readings in real-time with dynamic visualization</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card welcome-card text-center h-100" onclick="showSection('predictive-analysis')">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <i class="bi bi-bar-chart welcome-icon"></i>
-                            <h4 class="card-title">Predictive Analysis</h4>
-                            <p class="card-text text-muted">View predictions and detect anomalies in your system</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card welcome-card text-center h-100" onclick="showSection('help-contact')">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <i class="bi bi-question-circle welcome-icon"></i>
-                            <h4 class="card-title">Help & Contact</h4>
-                            <p class="card-text text-muted">Find documentation, FAQs and ways to reach support</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card welcome-card text-center h-100" onclick="showSection('messages')">
-                        <div class="card-body d-flex flex-column justify-content-center">
-                            <i class="bi bi-chat-dots welcome-icon"></i>
-                            <h4 class="card-title">Messages & Broadcasts</h4>
-                            <p class="card-text text-muted">Send and receive system messages and important notifications</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Status Overview -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center bg-white">
-                            <h5 class="mb-0">System Status Overview</h5>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary" id="connectButton" onclick="connectWebSocket()">
-                                    <i class="bi bi-wifi"></i> Connect
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger d-none" id="disconnectButton" onclick="disconnectWebSocket()">
-                                    <i class="bi bi-wifi-off"></i> Disconnect
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="bi bi-thermometer-half text-primary fs-1"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="fw-light text-muted mb-0">Temperature</h6>
-                                            <h4 class="mb-0"><span id="welcome-temp-value">--</span> <small class="text-muted">°C</small></h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="bi bi-droplet-half text-primary fs-1"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="fw-light text-muted mb-0">Humidity</h6>
-                                            <h4 class="mb-0"><span id="welcome-humidity-value">--</span> <small class="text-muted">%</small></h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="bi bi-water text-primary fs-1"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="fw-light text-muted mb-0">Volume</h6>
-                                            <h4 class="mb-0"><span id="welcome-volume-value">--</span> <small class="text-muted">L</small></h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <i class="bi bi-activity text-primary fs-1"></i>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="fw-light text-muted mb-0">Vibration</h6>
-                                            <h4 class="mb-0"><span id="welcome-vibration-value">--</span> <small class="text-muted">units</small></h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- WebSocket Connection Setup -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header bg-white">
-                            <h5 class="mb-0">WebSocket Connection</h5>
-                        </div>
-                        <div class="card-body">
-                            <form id="wsConnectionForm" class="row g-3 align-items-end">
-                                <div class="col-md-5">
-                                    <label for="wsHost" class="form-label">WebSocket Host</label>
-                                    <input type="text" class="form-control" id="wsHost" value="localhost">
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="wsPort" class="form-label">Port</label>
-                                    <input type="number" class="form-control" id="wsPort" value="8765">
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="button" class="btn btn-primary w-100" onclick="updateWebSocketConnection()">
-                                        <i class="bi bi-arrow-repeat me-2"></i>Update Connection
-                                    </button>
-                                </div>
-                            </form>
-                            <div class="mt-3">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    <strong>Connection Status:</strong> <span id="wsConnectionStatus">Not connected</span>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mt-2">
-                                    <small class="text-muted">Last received: <span id="lastDataReceived">Never</span></small>
-                                    <small class="text-muted">Data points collected: <span id="dataPointsCount">0</span></small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Real-Time Sensor Data Section -->
-        <div id="sensor-data" class="section fade-in d-none">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-                <h2 class="mb-0">Real-Time Sensor Data</h2>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#" onclick="showSection('welcome')">Home</a></li>
-                        <li class="breadcrumb-item active">Sensor Data</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <ul class="nav nav-tabs mb-4" id="sensorTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="current-tab-btn" data-bs-toggle="tab" data-bs-target="#current-tab-pane" type="button" role="tab">
-                        <i class="bi bi-activity me-1"></i> Current Readings
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="history-tab-btn" data-bs-toggle="tab" data-bs-target="#history-tab-pane" type="button" role="tab">
-                        <i class="bi bi-clock-history me-1"></i> Historical Data
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="settings-tab-btn" data-bs-toggle="tab" data-bs-target="#settings-tab-pane" type="button" role="tab">
-                        <i class="bi bi-gear me-1"></i> Sensor Settings
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="sensorTabsContent">
-                <!-- Current Readings Tab -->
-                <div class="tab-pane fade show active" id="current-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="row g-4">
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card h-100">
-                                <div class="card-body sensor-card">
-                                    <i class="bi bi-thermometer-half text-primary fs-1 mb-3"></i>
-                                    <h3>Temperature</h3>
-                                    <div class="sensor-value" id="temp-value">--</div>
-                                    <div class="sensor-unit">°C</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card h-100">
-                                <div class="card-body sensor-card">
-                                    <i class="bi bi-droplet-half text-primary fs-1 mb-3"></i>
-                                    <h3>Humidity</h3>
-                                    <div class="sensor-value" id="humidity-value">--</div>
-                                    <div class="sensor-unit">%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card h-100">
-                                <div class="card-body sensor-card">
-                                    <i class="bi bi-water text-primary fs-1 mb-3"></i>
-                                    <h3>Volume</h3>
-                                    <div class="sensor-value" id="volume-value">--</div>
-                                    <div class="sensor-unit">Liters</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card h-100">
-                                <div class="card-body sensor-card">
-                                    <i class="bi bi-activity text-primary fs-1 mb-3"></i>
-                                    <h3>Vibration</h3>
-                                    <div class="sensor-value" id="vibration-value">--</div>
-                                    <div class="sensor-unit">units</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card mt-4">
-                        <div class="card-body">
-                            <h5 class="mb-4">Live Data Stream</h5>
-                            <div class="alert alert-light border p-3">
-                                <pre id="raw-data-display" class="m-0" style="max-height: 200px; overflow-y: auto;">Waiting for data...</pre>
-                            </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="autoScrollSwitch" checked>
-                                <label class="form-check-label" for="autoScrollSwitch">Auto-scroll to latest data</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Historical Data Tab -->
-                <div class="tab-pane fade" id="history-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="sensor-select" class="form-label">Select Sensor:</label>
-                                        <select id="sensor-select" class="form-select" onchange="updateHistoryChart()">
-                                            <option value="temperature">Temperature</option>
-                                            <option value="humidity">Humidity</option>
-                                            <option value="volume_liters">Volume</option>
-                                            <option value="vibration_level">Vibration</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="data-points-range" class="form-label">Data Points: <span id="data-points-value">50</span></label>
-                                        <input type="range" class="form-range" id="data-points-range" min="10" max="200" step="10" value="50" onchange="updateHistoryChart()">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="history-chart"></canvas>
-                            </div>
-                            <div class="d-flex justify-content-end mt-3">
-                                <button class="btn btn-outline-primary" onclick="exportData()">
-                                    <i class="bi bi-download me-1"></i> Export Data
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Sensor Settings Tab -->
-                <div class="tab-pane fade" id="settings-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="sensor-settings-form">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="temp-calibration" class="form-label">Temperature Calibration:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="temp-calibration" step="0.1" value="0.0">
-                                            <span class="input-group-text">°C</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="humidity-calibration" class="form-label">Humidity Calibration:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="humidity-calibration" step="0.1" value="0.0">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="alarm-temp-high" class="form-label">High Temperature Alarm:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="alarm-temp-high" value="40">
-                                            <span class="input-group-text">°C</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="alarm-temp-low" class="form-label">Low Temperature Alarm:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="alarm-temp-low" value="5">
-                                            <span class="input-group-text">°C</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="alarm-volume-high" class="form-label">High Volume Alarm:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="alarm-volume-high" value="100">
-                                            <span class="input-group-text">L</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="alarm-vibration-high" class="form-label">High Vibration Alarm:</label>
-                                        <div class="input-group mb-3">
-                                            <input type="number" class="form-control" id="alarm-vibration-high" value="20">
-                                            <span class="input-group-text">units</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="enable-notifications" checked>
-                                            <label class="form-check-label" for="enable-notifications">Enable Alarm Notifications</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <button type="button" class="btn btn-primary" onclick="saveSensorSettings()">Save Settings</button>
-                                    <button type="button" class="btn btn-outline-secondary ms-2" onclick="resetSensorSettings()">Reset to Defaults</button>
-                                </div>
-                            </form>
-                            <div id="settings-alert" class="alert mt-3 d-none"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Predictive Analysis Section -->
-        <div id="predictive-analysis" class="section fade-in d-none">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-                <h2 class="mb-0">Predictive Analysis</h2>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#" onclick="showSection('welcome')">Home</a></li>
-                        <li class="breadcrumb-item active">Predictive Analysis</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <ul class="nav nav-tabs mb-4" id="predictionTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="forecast-tab-btn" data-bs-toggle="tab" data-bs-target="#forecast-tab-pane" type="button" role="tab">
-                        <i class="bi bi-graph-up-arrow me-1"></i> Forecast
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="anomalies-tab-btn" data-bs-toggle="tab" data-bs-target="#anomalies-tab-pane" type="button" role="tab">
-                        <i class="bi bi-exclamation-triangle me-1"></i> Anomaly Detection
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="prediction-settings-tab-btn" data-bs-toggle="tab" data-bs-target="#prediction-settings-tab-pane" type="button" role="tab">
-                        <i class="bi bi-gear me-1"></i> Analysis Settings
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="predictionTabsContent">
-                <!-- Forecast Tab -->
-                <div class="tab-pane fade show active" id="forecast-tab-pane" role="tabpanel" tabindex="0">
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Temperature Trend</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="prediction-value" id="temp-prediction">Collecting data...</div>
-                                    <div class="chart-container">
-                                        <canvas id="temp-forecast-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-md-4">
+                            <p><strong>Last Updated:</strong> <span id="lastUpdated">--</span></p>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Humidity Trend</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="prediction-value" id="humidity-prediction">Collecting data...</div>
-                                    <div class="chart-container">
-                                        <canvas id="humidity-forecast-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-md-4">
+                            <p><strong>Connection:</strong> <span id="connectionInfo">ws://192.168.76.140:5000</span></p>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Volume Trend</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="prediction-value" id="volume-prediction">Collecting data...</div>
-                                    <div class="chart-container">
-                                        <canvas id="volume-forecast-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Vibration Trend</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="prediction-value" id="vibration-prediction">Collecting data...</div>
-                                    <div class="chart-container">
-                                        <canvas id="vibration-forecast-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center mt-2">
-                        <button class="btn btn-primary" onclick="updatePredictions()">
-                            <i class="bi bi-arrow-clockwise me-1"></i> Update Analysis
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Anomaly Detection Tab -->
-                <div class="tab-pane fade" id="anomalies-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Detected Anomalies</h5>
-                            <div class="d-flex align-items-center">
-                                <label for="anomaly-threshold" class="form-label mb-0 me-2">Sensitivity:</label>
-                                <select id="anomaly-threshold" class="form-select form-select-sm" style="width: auto;" onchange="updateAnomalyDetection()">
-                                    <option value="3">High (3σ)</option>
-                                    <option value="2" selected>Medium (2σ)</option>
-                                    <option value="1">Low (1σ)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="list-group list-group-flush" id="anomalies-list">
-                            <div class="list-group-item">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">Collecting data for anomaly detection...</h6>
-                                </div>
-                                <p class="mb-1">Anomalies will be detected once sufficient data is collected.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <h5 class="mb-0">Anomaly Visualization</h5>
-                            <div>
-                                <select id="anomaly-sensor" class="form-select form-select-sm" onchange="updateAnomalyChart()">
-                                    <option value="temperature">Temperature</option>
-                                    <option value="humidity">Humidity</option>
-                                    <option value="volume_liters">Volume</option>
-                                    <option value="vibration_level">Vibration</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="anomalies-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Analysis Settings Tab -->
-                <div class="tab-pane fade" id="prediction-settings-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="prediction-settings-form">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="prediction-window" class="form-label">Data Window for Analysis:</label>
-                                        <select id="prediction-window" class="form-select">
-                                            <option value="20">Last 20 points</option>
-                                            <option value="50" selected>Last 50 points</option>
-                                            <option value="100">Last 100 points</option>
-                                            <option value="200">Last 200 points</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="prediction-method" class="form-label">Prediction Method:</label>
-                                        <select id="prediction-method" class="form-select">
-                                            <option value="linear">Linear Regression</option>
-                                            <option value="moving-avg" selected>Moving Average</option>
-                                            <option value="exponential">Exponential Smoothing</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="update-interval" class="form-label">Chart Update Interval:</label>
-                                        <select id="update-interval" class="form-select">
-                                            <option value="1000">Every second</option>
-                                            <option value="5000" selected>Every 5 seconds</option>
-                                            <option value="10000">Every 10 seconds</option>
-                                            <option value="30000">Every 30 seconds</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="anomaly-window" class="form-label">Anomaly Detection Window:</label>
-                                        <select id="anomaly-window" class="form-select">
-                                            <option value="20">Last 20 points</option>
-                                            <option value="50" selected>Last 50 points</option>
-                                            <option value="100">Last 100 points</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <button type="button" class="btn btn-primary" onclick="saveAnalysisSettings()">Apply Settings</button>
-                                </div>
-                            </form>
-                            <div id="prediction-settings-alert" class="alert mt-3 d-none"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Help and Contact Section -->
-        <div id="help-contact" class="section fade-in d-none">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-                <h2 class="mb-0">Help & Contact</h2>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#" onclick="showSection('welcome')">Home</a></li>
-                        <li class="breadcrumb-item active">Help & Contact</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <ul class="nav nav-tabs mb-4" id="helpTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="faq-tab-btn" data-bs-toggle="tab" data-bs-target="#faq-tab-pane" type="button" role="tab">
-                        <i class="bi bi-question-circle me-1"></i> FAQ
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="contact-tab-btn" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab">
-                        <i class="bi bi-envelope me-1"></i> Contact Us
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="docs-tab-btn" data-bs-toggle="tab" data-bs-target="#docs-tab-pane" type="button" role="tab">
-                        <i class="bi bi-file-text me-1"></i> Documentation
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="helpTabsContent">
-                <!-- FAQ Tab -->
-                <div class="tab-pane fade show active" id="faq-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="accordion" id="faqAccordion">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne">
-                                            How do I connect to the WebSocket server?
-                                        </button>
-                                    </h2>
-                                    <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-                                        <div class="accordion-body">
-                                            <p>To connect to the WebSocket server:</p>
-                                            <ol>
-                                                <li>Go to the Home page</li>
-                                                <li>Enter the IP address or hostname of your WebSocket server in the "WebSocket Host" field</li>
-                                                <li>Enter the port number (default is 8765)</li>
-                                                <li>Click "Update Connection" button</li>
-                                                <li>The dashboard will automatically connect and display data as it's received</li>
-                                            </ol>
-                                            <p>If your server is running on the same machine as the dashboard, you can use "localhost" as the host.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo">
-                                            What data is being displayed?
-                                        </button>
-                                    </h2>
-                                    <div id="faqTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                        <div class="accordion-body">
-                                            <p>The dashboard displays the following sensor data:</p>
-                                            <ul>
-                                                <li><span class="param-highlight">Temperature</span>: Temperature readings in degrees Celsius (°C)</li>
-                                                <li><span class="param-highlight">Humidity</span>: Relative humidity in percentage (%)</li>
-                                                <li><span class="param-highlight">Volume</span>: Volume of liquid in liters (L)</li>
-                                                <li><span class="param-highlight">Vibration</span>: Vibration level in arbitrary units</li>
-                                            </ul>
-                                            <p>The data is received in real-time from your ESP8266 device via the WebSocket server.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree">
-                                            How does the anomaly detection work?
-                                        </button>
-                                    </h2>
-                                    <div id="faqThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                        <div class="accordion-body">
-                                            <p>The anomaly detection system identifies unusual sensor readings using statistical methods:</p>
-                                            <ul>
-                                                <li>It calculates the mean and standard deviation of recent readings</li>
-                                                <li>Any value that deviates beyond a certain threshold (measured in standard deviations) is considered an anomaly</li>
-                                                <li>You can adjust the sensitivity in the Anomaly Detection tab:
-                                                    <ul>
-                                                        <li><strong>High sensitivity (1σ)</strong>: Detects minor deviations (more anomalies)</li>
-                                                        <li><strong>Medium sensitivity (2σ)</strong>: Balanced detection (default)</li>
-                                                        <li><strong>Low sensitivity (3σ)</strong>: Only detects major deviations (fewer anomalies)</li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                            <p>The system needs to collect sufficient data before it can effectively detect anomalies.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour">
-                                            Can I export my sensor data?
-                                        </button>
-                                    </h2>
-                                    <div id="faqFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                        <div class="accordion-body">
-                                            <p>Yes, you can export your sensor data in CSV format:</p>
-                                            <ol>
-                                                <li>Go to the "Sensor Data" section</li>
-                                                <li>Select the "Historical Data" tab</li>
-                                                <li>Choose the sensor you want to export data for</li>
-                                                <li>Click the "Export Data" button</li>
-                                            </ol>
-                                            <p>The exported file will include timestamps and sensor values for the selected data type.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFive">
-                                            How do I set up alerts for my sensors?
-                                        </button>
-                                    </h2>
-                                    <div id="faqFive" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                        <div class="accordion-body">
-                                            <p>To set up sensor alerts:</p>
-                                            <ol>
-                                                <li>Go to the "Sensor Data" section</li>
-                                                <li>Select the "Sensor Settings" tab</li>
-                                                <li>Set your desired threshold values:
-                                                    <ul>
-                                                        <li>High Temperature Alarm</li>
-                                                        <li>Low Temperature Alarm</li>
-                                                        <li>High Volume Alarm</li>
-                                                        <li>High Vibration Alarm</li>
-                                                    </ul>
-                                                </li>
-                                                <li>Make sure "Enable Alarm Notifications" is checked</li>
-                                                <li>Click "Save Settings"</li>
-                                            </ol>
-                                            <p>When a sensor reading exceeds your set thresholds, a notification will appear on the dashboard.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Contact Tab -->
-                <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="contact-form">
-                                <div class="mb-3">
-                                    <label for="contact-name" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="contact-name" placeholder="Your name">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="contact-email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="contact-email" placeholder="Your email address">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="contact-subject" class="form-label">Subject</label>
-                                    <select class="form-select" id="contact-subject">
-                                        <option value="support">Technical Support</option>
-                                        <option value="feature">Feature Request</option>
-                                        <option value="bug">Bug Report</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="contact-message" class="form-label">Message</label>
-                                    <textarea class="form-control" id="contact-message" rows="5" placeholder="Please describe your issue or question in detail"></textarea>
-                                </div>
-                                <button type="button" class="btn btn-primary" onclick="submitContactForm()">Send Message</button>
-                            </form>
-                            <div id="contact-alert" class="alert mt-3 d-none"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Documentation Tab -->
-                <div class="tab-pane fade" id="docs-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="docs-section">
-                                <h4>System Overview</h4>
-                                <p>This dashboard provides a real-time monitoring interface for your ESP8266 sensor data through a WebSocket connection.</p>
-                                <p>The system consists of three main components:</p>
-                                <ul>
-                                    <li><strong>ESP8266 Device</strong>: Collects sensor data and sends it via UART</li>
-                                    <li><strong>Python WebSocket Server</strong>: Receives data from ESP8266 and broadcasts it via WebSocket</li>
-                                    <li><strong>Web Dashboard</strong>: Connects to the WebSocket server and displays the data</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="docs-section">
-                                <h4>Data Format</h4>
-                                <p>The ESP8266 sends data in the following format through the UART connection:</p>
-                                <div class="alert alert-light border">
-                                    <code>temperature,humidity,volume_liters,vibration_level</code>
-                                </div>
-                                <p>Example:</p>
-                                <div class="alert alert-light border">
-                                    <code>23.5,45.2,78.6,12.4</code>
-                                </div>
-                                <p>This data is then converted to JSON before being sent via WebSocket:</p>
-                                <div class="alert alert-light border">
-                                    <pre>{
-  "temperature": 23.5,
-  "humidity": 45.2,
-  "volume_liters": 78.6,
-  "vibration_level": 12.4
-}</pre>
-                                </div>
-                            </div>
-                            
-                            <div class="docs-section">
-                                <h4>WebSocket Connection</h4>
-                                <p>The dashboard connects to your Python WebSocket server using the following parameters:</p>
-                                <ul>
-                                    <li><strong>Protocol</strong>: ws:// (WebSocket)</li>
-                                    <li><strong>Host</strong>: IP address or hostname of your server (default: localhost)</li>
-                                    <li><strong>Port</strong>: 8765 (default port used by your Python script)</li>
-                                </ul>
-                                <p>The WebSocket connection allows for real-time data updates without the need for polling or refreshing the page.</p>
-                            </div>
-                            
-                            <div class="docs-section">
-                                <h4>Troubleshooting</h4>
-                                <p>If you experience issues with the dashboard:</p>
-                                <ol>
-                                    <li><strong>Connection Problems</strong>:
-                                        <ul>
-                                            <li>Verify your Python WebSocket server is running</li>
-                                            <li>Check that you've entered the correct host and port</li>
-                                            <li>Ensure there are no firewall restrictions blocking WebSocket connections</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Data Not Displaying</strong>:
-                                        <ul>
-                                            <li>Check the ESP8266 UART connection</li>
-                                            <li>Verify the data format being sent matches what's expected</li>
-                                            <li>Look at the browser console for any error messages</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>Chart Issues</strong>:
-                                        <ul>
-                                            <li>Try adjusting the number of data points displayed</li>
-                                            <li>Refresh the page to clear any cached data</li>
-                                        </ul>
-                                    </li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Message & Broadcast Section -->
-        <div id="messages" class="section fade-in d-none">
-            <div class="page-header d-flex justify-content-between align-items-center flex-wrap">
-                <h2 class="mb-0">Messages & Broadcasts</h2>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#" onclick="showSection('welcome')">Home</a></li>
-                        <li class="breadcrumb-item active">Messages & Broadcasts</li>
-                    </ol>
-                </nav>
-            </div>
-
-            <ul class="nav nav-tabs mb-4" id="messageTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="alerts-tab-btn" data-bs-toggle="tab" data-bs-target="#alerts-tab-pane" type="button" role="tab">
-                        <i class="bi bi-bell me-1"></i> System Alerts
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="events-tab-btn" data-bs-toggle="tab" data-bs-target="#events-tab-pane" type="button" role="tab">
-                        <i class="bi bi-calendar-event me-1"></i> Event Log
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="settings-msg-tab-btn" data-bs-toggle="tab" data-bs-target="#settings-msg-tab-pane" type="button" role="tab">
-                        <i class="bi bi-gear me-1"></i> Notification Settings
-                    </button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="messageTabsContent">
-                <!-- System Alerts Tab -->
-                <div class="tab-pane fade show active" id="alerts-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Active Alerts</h5>
-                            <button class="btn btn-sm btn-outline-primary" onclick="clearAlerts()">
-                                <i class="bi bi-check-all me-1"></i> Clear All
-                            </button>
-                        </div>
-                        <div id="alerts-container">
-                            <div class="list-group list-group-flush message-list" id="alerts-list">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">No active alerts</h6>
-                                        <small class="text-muted">now</small>
-                                    </div>
-                                    <p class="mb-1">System is functioning normally. Alerts will appear here when sensor readings exceed thresholds.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Event Log Tab -->
-                <div class="tab-pane fade" id="events-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">System Event Log</h5>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="exportEventLog()">
-                                    <i class="bi bi-download me-1"></i> Export Log
-                                </button>
-                            </div>
-                        </div>
-                        <div class="list-group list-group-flush message-list" id="events-list">
-                            <div class="list-group-item">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">System initialized</h6>
-                                    <small class="text-muted">now</small>
-                                </div>
-                                <p class="mb-1">Dashboard ready to receive sensor data.</p>
-                                <small class="text-muted">System event</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Notification Settings Tab -->
-                <div class="tab-pane fade" id="settings-msg-tab-pane" role="tabpanel" tabindex="0">
-                    <div class="card">
-                        <div class="card-body">
-                            <form id="notification-settings-form">
-                                <h5 class="mb-3">Alert Notification Settings</h5>
-                                <div class="mb-3">
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="enable-alerts" checked>
-                                        <label class="form-check-label" for="enable-alerts">Enable System Alerts</label>
-                                    </div>
-                                </div>
-                                
-                                <h6 class="mt-4 mb-3">Notification Types</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notify-temperature" checked>
-                                            <label class="form-check-label" for="notify-temperature">Temperature Alerts</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notify-humidity" checked>
-                                            <label class="form-check-label" for="notify-humidity">Humidity Alerts</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notify-volume" checked>
-                                            <label class="form-check-label" for="notify-volume">Volume Alerts</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="notify-vibration" checked>
-                                            <label class="form-check-label" for="notify-vibration">Vibration Alerts</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <h6 class="mt-4 mb-3">Alert Cooldown</h6>
-                                <div class="mb-3">
-                                    <label for="alert-cooldown" class="form-label">Minimum time between alerts:</label>
-                                    <select class="form-select" id="alert-cooldown">
-                                        <option value="0">No cooldown (alert on every event)</option>
-                                        <option value="30" selected>30 seconds</option>
-                                        <option value="60">1 minute</option>
-                                        <option value="300">5 minutes</option>
-                                    </select>
-                                </div>
-                                
-                                <button type="button" class="btn btn-primary mt-3" onclick="saveNotificationSettings()">Save Settings</button>
-                            </form>
-                            <div id="notification-settings-alert" class="alert mt-3 d-none"></div>
+                        <div class="col-md-4">
+                            <p><strong>Uptime:</strong> <span id="uptime">--</span></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>ESP32 IoT Dashboard</h5>
-                    <p class="text-muted">Real-time monitoring system for ESP8266 sensors</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">Version 1.0.0</p>
-                    <p class="text-muted">Optimized for WebSocket data streams</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    // Initialize time tracking for uptime and last update timestamp
+    const startTime = new Date();
+    let lastUpdateTime = null;
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Global variables
-        let ws = null;
-        let currentSection = 'welcome';
-        let wsConnected = false;
-        let lastUpdateTime = null;
-        let dataPointsCount = 0;
-        let autoReconnect = true;
-        let reconnectAttempts = 0;
-        let reconnectInterval = null;
-        let chartUpdateInterval = null;
+    // Maximum data points for charts
+    const maxDataPoints = 20;
+    const temperatureData = Array(maxDataPoints).fill(null);
+    const humidityData = Array(maxDataPoints).fill(null);
+    const soilMoistureData = Array(maxDataPoints).fill(null);
+    const timeLabels = Array(maxDataPoints).fill('');
 
-        // Sensor data storage
-        let sensorData = {
-            temperature: [],
-            humidity: [],
-            volume_liters: [],
-            vibration_level: []
-        };
+    // Format time string
+    function formatTime(date) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
 
-        // Alert and event logging
-        let systemAlerts = [];
-        let eventLog = [];
-        
-        // Analysis settings
-        let analysisSettings = {
-            predictionWindow: 50,
-            predictionMethod: 'moving-avg',
-            updateInterval: 5000,
-            anomalyWindow: 50,
-            anomalyThreshold: 2
-        };
+    // Update uptime display
+    function updateUptime() {
+        const now = new Date();
+        const diff = now - startTime;
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show welcome section by default
-            initializeApp();
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
 
-            // Update data points slider label
-            document.getElementById('data-points-range').addEventListener('input', function() {
-                document.getElementById('data-points-value').textContent = this.value;
-            });
-        });
+        document.getElementById('uptime').innerText =
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 
-        function initializeApp() {
-            // Hide loading overlay
-            document.getElementById('loadingOverlay').classList.add('d-none');
-            
-            // Show welcome section
-            showSection('welcome');
-            
-            // Initialize Bootstrap components
-            initializeBootstrapComponents();
-            
-            // Log system initialization event
-            logEvent("System initialized", "Dashboard ready to receive sensor data.");
-            
-            // Attempt to connect to default WebSocket if host and port are specified
-            const wsHost = document.getElementById('wsHost').value;
-            const wsPort = document.getElementById('wsPort').value;
-            
-            if (wsHost && wsPort) {
-                connectWebSocket();
-            }
-        }
-
-        function initializeBootstrapComponents() {
-            // Set up Bootstrap tooltips
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-            
-            // Set up Bootstrap popovers
-            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-            popoverTriggerList.map(function (popoverTriggerEl) {
-                return new bootstrap.Popover(popoverTriggerEl);
-            });
-        }
-
-        // Function to show the selected section
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.add('d-none');
-                section.classList.remove('fade-in');
-            });
-            
-            // Show selected section with animation
-            const selectedSection = document.getElementById(sectionId);
-            if (selectedSection) {
-                selectedSection.classList.remove('d-none');
-                // Trigger reflow
-                void selectedSection.offsetWidth;
-                selectedSection.classList.add('fade-in');
-            }
-            
-            currentSection = sectionId;
-            
-            // Update active state in navbar
-            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-            for (const link of navLinks) {
-                if (link.textContent.toLowerCase().includes(sectionId === 'welcome' ? 'home' : sectionId.replace('-', ' '))) {
-                    link.classList.add('active');
-                    break;
+    // Initialize charts using Chart.js
+    const temperatureChart = new Chart(document.getElementById('temperatureChart'), {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: temperatureData,
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(46, 125, 50, 0.1)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#2e7d32',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
                 }
-            }
-            
-            // Initialize section content
-            if (sectionId === 'sensor-data') {
-                // If we have data, update the history chart
-                if (Object.values(sensorData).some(arr => arr.length > 0)) {
-                    updateHistoryChart();
-                }
-            } else if (sectionId === 'predictive-analysis') {
-                // Update predictions if we have data
-                if (Object.values(sensorData).some(arr => arr.length > 0)) {
-                    updatePredictions();
-                    updateAnomalyDetection();
-                }
-            }
+            },
+            plugins: { legend: { display: false } },
+            animation: { duration: 500 }
         }
-
-        // WebSocket Connection Functions
-        function updateWebSocketConnection() {
-            const host = document.getElementById('wsHost').value;
-            const port = document.getElementById('wsPort').value;
-            
-            if (!host || !port) {
-                showConnectionAlert("Please enter a valid host and port.");
-                return;
-            }
-            
-            // Disconnect existing connection if any
-            if (ws) {
-                disconnectWebSocket();
-            }
-            
-            // Connect to new WebSocket
-            connectWebSocket();
-        }
-
-        function connectWebSocket() {
-            const host = document.getElementById('wsHost').value;
-            const port = document.getElementById('wsPort').value;
-            
-            if (!host || !port) {
-                showConnectionAlert("Please enter a valid host and port.");
-                return;
-            }
-            
-            try {
-                // Update UI to show connecting state
-                document.getElementById('wsConnectionStatus').textContent = "Connecting...";
-                document.getElementById('wsConnectionStatus').parentElement.className = "alert alert-info";
-                
-                // Create WebSocket connection
-                ws = new WebSocket(`ws://${host}:${port}`);
-                
-                // WebSocket event handlers
-                ws.onopen = handleWebSocketOpen;
-                ws.onmessage = handleWebSocketMessage;
-                ws.onerror = handleWebSocketError;
-                ws.onclose = handleWebSocketClose;
-                
-                // Update UI buttons
-                document.getElementById('connectButton').classList.add('d-none');
-                document.getElementById('disconnectButton').classList.remove('d-none');
-                
-                // Log connection attempt
-                logEvent("Connection attempt", `Trying to connect to WebSocket server at ${host}:${port}`);
-                
-            } catch (error) {
-                console.error("WebSocket connection error:", error);
-                showConnectionAlert("Failed to connect to WebSocket server.");
-                
-                // Log connection error
-                logEvent("Connection error", error.message || "Failed to connect to WebSocket server");
-            }
-        }
-
-        function disconnectWebSocket() {
-            if (ws) {
-                // Close the connection
-                ws.close();
-                
-                // Update UI
-                document.getElementById('connectButton').classList.remove('d-none');
-                document.getElementById('disconnectButton').classList.add('d-none');
-                
-                // Cancel auto-reconnect
-                autoReconnect = false;
-                if (reconnectInterval) {
-                    clearInterval(reconnectInterval);
-                    reconnectInterval = null;
-                }
-                
-                // Log disconnection
-                logEvent("Disconnected", "WebSocket connection closed by user");
-            }
-        }
-
-        function handleWebSocketOpen(event) {
-            // Connection established
-            wsConnected = true;
-            reconnectAttempts = 0;
-            
-            // Update connection status
-            document.getElementById('wsConnectionStatus').textContent = "Connected";
-            document.getElementById('wsConnectionStatus').parentElement.className = "alert alert-success";
-            
-            // Show connection badge
-            const connectionBadge = document.getElementById('connectionBadge');
-            connectionBadge.classList.remove('bg-danger', 'd-none');
-            connectionBadge.classList.add('bg-success');
-            connectionBadge.innerHTML = '<i class="bi bi-wifi"></i> Connected';
-            
-            setTimeout(() => {
-                connectionBadge.classList.add('d-none');
-            }, 3000);
-            
-            // Log connection event
-            logEvent("Connected", "WebSocket connection established");
-            
-            // Update UI elements
-            updateSystemStatusIndicator(true);
-        }
-
-        function handleWebSocketMessage(event) {
-            try {
-                // Parse the incoming JSON data
-                const data = JSON.parse(event.data);
-                
-                // Update timestamp
-                lastUpdateTime = new Date();
-                document.getElementById('lastUpdateTime').textContent = `Last update: ${formatTime(lastUpdateTime)}`;
-                document.getElementById('lastDataReceived').textContent = formatTime(lastUpdateTime);
-                
-                // Increment data point counter
-                dataPointsCount++;
-                document.getElementById('dataPointsCount').textContent = dataPointsCount;
-                
-                // Store the data in our history arrays
-                for (const key in data) {
-                    if (sensorData.hasOwnProperty(key)) {
-                        sensorData[key].push({
-                            value: data[key],
-                            timestamp: lastUpdateTime.getTime()
-                        });
-                        
-                        // Limit array size to prevent memory issues
-                        if (sensorData[key].length > 1000) {
-                            sensorData[key].shift();
-                        }
-                    }
-                }
-                
-                // Update the sensor displays
-                updateSensorDisplays(data);
-                
-                // Update raw data display
-                updateRawDataDisplay(data);
-                
-                // Check for alert conditions
-                checkAlertConditions(data);
-                
-                // If we're on the history page, update the chart
-                if (currentSection === 'sensor-data' && !document.getElementById('history-tab-pane').classList.contains('d-none')) {
-                    updateHistoryChart();
-                }
-                
-                // Schedule updates for predictions and anomaly detection
-                if (!chartUpdateInterval) {
-                    chartUpdateInterval = setInterval(() => {
-                        if (currentSection === 'predictive-analysis') {
-                            updatePredictions();
-                            updateAnomalyDetection();
-                        }
-                    }, analysisSettings.updateInterval);
-                }
-                
-            } catch (error) {
-                console.error("Error processing WebSocket message:", error);
-                logEvent("Data error", "Failed to process incoming data: " + error.message);
-            }
-        }
-
-        function handleWebSocketError(event) {
-            console.error("WebSocket error:", event);
-            
-            // Log the error
-            logEvent("Connection error", "WebSocket encountered an error");
-            
-            // Show error notification
-            showConnectionAlert("WebSocket error occurred. Check console for details.");
-        }
-
-        function handleWebSocketClose(event) {
-            // Connection closed
-            wsConnected = false;
-            ws = null;
-            
-            // Update connection status
-            document.getElementById('wsConnectionStatus').textContent = "Disconnected";
-            document.getElementById('wsConnectionStatus').parentElement.className = "alert alert-danger";
-            
-            // Show disconnection badge
-            const connectionBadge = document.getElementById('connectionBadge');
-            connectionBadge.classList.remove('bg-success', 'd-none');
-            connectionBadge.classList.add('bg-danger');
-            connectionBadge.innerHTML = '<i class="bi bi-wifi-off"></i> Disconnected';
-            
-            setTimeout(() => {
-                connectionBadge.classList.add('d-none');
-            }, 3000);
-            
-            // Update UI buttons
-            document.getElementById('connectButton').classList.remove('d-none');
-            document.getElementById('disconnectButton').classList.add('d-none');
-            
-            // Log disconnection
-            logEvent("Disconnected", `WebSocket connection closed (Code: ${event.code})`);
-            
-            // Update system status indicator
-            updateSystemStatusIndicator(false);
-            
-            // Clear chart update interval
-            if (chartUpdateInterval) {
-                clearInterval(chartUpdateInterval);
-                chartUpdateInterval = null;
-            }
-            
-            // Auto reconnect if enabled
-            if (autoReconnect) {
-                reconnectAttempts++;
-                
-                // Exponential backoff for reconnection (max 10 seconds)
-                const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts - 1), 10000);
-                
-                document.getElementById('wsConnectionStatus').textContent = `Reconnecting in ${Math.round(delay/1000)}s...`;
-                
-                if (!reconnectInterval) {
-                    reconnectInterval = setTimeout(() => {
-                        reconnectInterval = null;
-                        if (autoReconnect) {
-                            connectWebSocket();
-                        }
-                    }, delay);
-                }
-            }
-        }
-
-        function showConnectionAlert(message) {
-            // Create a toast-like message
-            const alertToast = document.createElement('div');
-            alertToast.className = 'connection-badge bg-danger text-white';
-            alertToast.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i> ${message}`;
-            
-            document.body.appendChild(alertToast);
-            
-            setTimeout(() => {
-                alertToast.remove();
-            }, 5000);
-        }
-
-        // Update sensor displays with new data
-        function updateSensorDisplays(data) {
-            // Update temperature displays
-            if (data.hasOwnProperty('temperature')) {
-                document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
-                document.getElementById('welcome-temp-value').textContent = data.temperature.toFixed(1);
-            }
-            
-            // Update humidity displays
-            if (data.hasOwnProperty('humidity')) {
-                document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
-                document.getElementById('welcome-humidity-value').textContent = data.humidity.toFixed(1);
-            }
-            
-            // Update volume displays
-            if (data.hasOwnProperty('volume_liters')) {
-                document.getElementById('volume-value').textContent = data.volume_liters.toFixed(1);
-                document.getElementById('welcome-volume-value').textContent = data.volume_liters.toFixed(1);
-            }
-            
-            // Update vibration displays
-            if (data.hasOwnProperty('vibration_level')) {
-                document.getElementById('vibration-value').textContent = data.vibration_level.toFixed(1);
-                document.getElementById('welcome-vibration-value').textContent = data.vibration_level.toFixed(1);
-            }
-        }
-
-        // Update the raw data display
-        function updateRawDataDisplay(data) {
-            const rawDataElement = document.getElementById('raw-data-display');
-            const timestamp = new Date().toLocaleTimeString();
-            
-            // Format the data as a JSON string with indentation
-            const formattedData = JSON.stringify(data, null, 2);
-            
-            // Add the new data to the display
-            rawDataElement.innerHTML = `${timestamp}: ${formattedData}\n\n${rawDataElement.innerHTML}`;
-            
-            // Limit the display to last 10 entries
-            const lines = rawDataElement.innerHTML.split('\n\n');
-            if (lines.length > 10) {
-                rawDataElement.innerHTML = lines.slice(0, 10).join('\n\n');
-            }
-            
-            // Auto-scroll if enabled
-            if (document.getElementById('autoScrollSwitch').checked) {
-                rawDataElement.scrollTop = 0;
-            }
-        }
-
-        // Update the system status indicator
-        function updateSystemStatusIndicator(isConnected) {
-            const indicator = document.getElementById('systemStatusIndicator');
-            const statusText = document.getElementById('systemStatusText');
-            
-            if (isConnected) {
-                indicator.className = 'status-indicator status-online';
-                statusText.textContent = 'System Online';
-            } else {
-                indicator.className = 'status-indicator status-offline';
-                statusText.textContent = 'System Offline';
-            }
-        }
-
-        // Format time for display
-        function formatTime(date) {
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        // Update history chart
-        function updateHistoryChart() {
-            const sensor = document.getElementById('sensor-select').value;
-            const dataPointsToShow = parseInt(document.getElementById('data-points-range').value);
-            
-            // Update data points display
-            document.getElementById('data-points-value').textContent = dataPointsToShow;
-            
-            // Check if we have data
-            if (!sensorData[sensor] || sensorData[sensor].length === 0) {
-                return;
-            }
-            
-            // Get the limited dataset
-            const dataToShow = sensorData[sensor].slice(-dataPointsToShow);
-            
-            // Extract values and timestamps
-            const values = dataToShow.map(point => point.value);
-            const timestamps = dataToShow.map(point => {
-                const date = new Date(point.timestamp);
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            });
-            
-            // Create a canvas context
-            const canvas = document.getElementById('history-chart');
-            const ctx = canvas.getContext('2d');
-            
-            // Clear previous chart
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw the chart
-            drawChart(ctx, values, timestamps, canvas.width, canvas.height, '#0d6efd');
-        }
-
-        // Generic chart drawing function
-        function drawChart(ctx, data, labels, width, height, color) {
-            if (!data || data.length === 0) return;
-            
-            const graphWidth = width - 60;
-            const graphHeight = height - 60;
-            const stepX = graphWidth / (data.length - 1);
-            
-            // Calculate min and max values with some padding
-            let minVal = Math.min(...data);
-            let maxVal = Math.max(...data);
-            const range = maxVal - minVal;
-            minVal = minVal - range * 0.1;
-            maxVal = maxVal + range * 0.1;
-            
-            // Draw the line
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
-            
-            for (let i = 0; i < data.length; i++) {
-                const x = 40 + i * stepX;
-                const y = graphHeight - ((data[i] - minVal) / (maxVal - minVal) * graphHeight) + 20;
-                
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-                
-                // Draw points
-                ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.stroke();
-                
-                // Continue the line
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-            }
-            
-            // Add a gradient fill below the line
-            const gradient = ctx.createLinearGradient(0, 20, 0, graphHeight + 20);
-            gradient.addColorStop(0, 'rgba(13, 110, 253, 0.2)');
-            gradient.addColorStop(1, 'rgba(13, 110, 253, 0)');
-            
-            ctx.lineTo(40 + (data.length - 1) * stepX, graphHeight + 20);
-            ctx.lineTo(40, graphHeight + 20);
-            ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
-            
-            // Draw axes
-            ctx.beginPath();
-            ctx.strokeStyle = '#999';
-            ctx.lineWidth = 1;
-            ctx.moveTo(40, 20);
-            ctx.lineTo(40, graphHeight + 20);
-            ctx.lineTo(graphWidth + 40, graphHeight + 20);
-            ctx.stroke();
-            
-            // Label the Y axis
-            ctx.fillStyle = '#333';
-            ctx.font = '12px Arial';
-            ctx.textAlign = 'right';
-            ctx.fillText(maxVal.toFixed(1), 35, 25);
-            ctx.fillText(minVal.toFixed(1), 35, graphHeight + 15);
-            
-            // Draw midpoint on Y axis
-            const midVal = (maxVal + minVal) / 2;
-            const midY = graphHeight - ((midVal - minVal) / (maxVal - minVal) * graphHeight) + 20;
-            ctx.beginPath();
-            ctx.strokeStyle = '#ddd';
-            ctx.setLineDash([5, 5]);
-            ctx.moveTo(40, midY);
-            ctx.lineTo(graphWidth + 40, midY);
-            ctx.stroke();
-            ctx.setLineDash([]);
-            ctx.fillText(midVal.toFixed(1), 35, midY + 4);
-            
-            // Label X axis (start, middle, end)
-            ctx.textAlign = 'center';
-            if (labels && labels.length > 0) {
-                // Start
-                ctx.fillText(labels[0], 40, graphHeight + 40);
-                
-                // Middle
-                if (labels.length > 2) {
-                    const midIndex = Math.floor(labels.length / 2);
-                    ctx.fillText(labels[midIndex], 40 + midIndex * stepX, graphHeight + 40);
-                }
-                
-                // End
-                ctx.fillText(labels[labels.length - 1], 40 + (labels.length - 1) * stepX, graphHeight + 40);
-            }
-        }
-
-        // Export data as CSV
-        function exportData() {
-            const sensor = document.getElementById('sensor-select').value;
-            
-            // Check if we have data
-            if (!sensorData[sensor] || sensorData[sensor].length === 0) {
-                showConnectionAlert("No data to export.");
-                return;
-            }
-            
-            // Create CSV content
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Timestamp," + sensor.replace('_', ' ') + "\n";
-            
-            // Add data rows
-            sensorData[sensor].forEach(point => {
-                const timestamp = new Date(point.timestamp).toISOString();
-                csvContent += `${timestamp},${point.value}\n`;
-            });
-            
-            // Create and trigger download
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `${sensor}_data_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
-            document.body.appendChild(link);
-            
-            link.click();
-            document.body.removeChild(link);
-            
-            // Log export event
-            logEvent("Data exported", `${sensorData[sensor].length} ${sensor} data points exported to CSV`);
-        }
-
-        // Save sensor settings
-        function saveSensorSettings() {
-            // Get values from form
-            const tempCalibration = parseFloat(document.getElementById('temp-calibration').value);
-            const humidityCalibration = parseFloat(document.getElementById('humidity-calibration').value);
-            const alarmTempHigh = parseFloat(document.getElementById('alarm-temp-high').value);
-            const alarmTempLow = parseFloat(document.getElementById('alarm-temp-low').value);
-            const alarmVolumeHigh = parseFloat(document.getElementById('alarm-volume-high').value);
-            const alarmVibrationHigh = parseFloat(document.getElementById('alarm-vibration-high').value);
-            const enableNotifications = document.getElementById('enable-notifications').checked;
-            
-            // Save settings (in a real application, these would be sent to the server)
-            const settings = {
-                tempCalibration,
-                humidityCalibration,
-                alarmTempHigh,
-                alarmTempLow,
-                alarmVolumeHigh,
-                alarmVibrationHigh,
-                enableNotifications
-            };
-            
-            // Store settings in localStorage for persistence
-            localStorage.setItem('sensorSettings', JSON.stringify(settings));
-            
-            // Show success message
-            const alertElement = document.getElementById('settings-alert');
-            alertElement.textContent = 'Settings saved successfully!';
-            alertElement.classList.remove('d-none', 'alert-danger');
-            alertElement.classList.add('alert-success');
-            
-            setTimeout(() => {
-                alertElement.classList.add('d-none');
-            }, 3000);
-            
-            // Log settings change
-            logEvent("Settings updated", "Sensor settings have been updated");
-        }
-
-        // Reset sensor settings to defaults
-        function resetSensorSettings() {
-            // Reset form values
-            document.getElementById('temp-calibration').value = "0.0";
-            document.getElementById('humidity-calibration').value = "0.0";
-            document.getElementById('alarm-temp-high').value = "40";
-            document.getElementById('alarm-temp-low').value = "5";
-            document.getElementById('alarm-volume-high').value = "100";
-            document.getElementById('alarm-vibration-high').value = "20";
-            document.getElementById('enable-notifications').checked = true;
-            
-            // Save the reset settings
-            saveSensorSettings();
-            
-            // Log reset event
-            logEvent("Settings reset", "Sensor settings have been reset to defaults");
-        }
-
-        // Update predictions based on collected data
-        function updatePredictions() {
-            // Get data window size from settings
-            const dataWindow = parseInt(document.getElementById('prediction-window').value);
-            
-            // Update temperature prediction
-            updateSensorPrediction('temperature', 'temp-prediction', 'temp-forecast-chart', dataWindow);
-            
-            // Update humidity prediction
-            updateSensorPrediction('humidity', 'humidity-prediction', 'humidity-forecast-chart', dataWindow);
-            
-            // Update volume prediction
-            updateSensorPrediction('volume_liters', 'volume-prediction', 'volume-forecast-chart', dataWindow);
-            
-            // Update vibration prediction
-            updateSensorPrediction('vibration_level', 'vibration-prediction', 'vibration-forecast-chart', dataWindow);
-        }
-
-        // Update prediction for a specific sensor
-        function updateSensorPrediction(sensorType, predictionElementId, chartElementId, dataWindow) {
-            // Check if we have enough data
-            if (!sensorData[sensorType] || sensorData[sensorType].length < 5) {
-                document.getElementById(predictionElementId).textContent = "Insufficient data for prediction";
-                return;
-            }
-            
-            // Get the most recent data points
-            const recentData = sensorData[sensorType].slice(-dataWindow);
-            const values = recentData.map(point => point.value);
-            
-            // Calculate trend metrics
-            const average = calculateAverage(values);
-            const trend = calculateTrend(values);
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            
-            // Generate prediction text
-            let predictionText = "";
-            if (Math.abs(trend) < 0.01) {
-                predictionText = `Stable at ${average.toFixed(1)}`;
-            } else if (trend > 0) {
-                predictionText = `Rising trend (${trend.toFixed(2)}/reading), Avg: ${average.toFixed(1)}`;
-            } else {
-                predictionText = `Falling trend (${trend.toFixed(2)}/reading), Avg: ${average.toFixed(1)}`;
-            }
-            
-            // Add range information
-            predictionText += `, Range: ${min.toFixed(1)} to ${max.toFixed(1)}`;
-            
-            // Update prediction text
-            document.getElementById(predictionElementId).textContent = predictionText;
-            
-            // Draw the trend visualization
-            drawTrendChart(sensorType, chartElementId, recentData, trend);
-        }
-
-        // Calculate average of array values
-        function calculateAverage(values) {
-            return values.reduce((sum, val) => sum + val, 0) / values.length;
-        }
-
-        // Calculate trend (slope of linear regression)
-        function calculateTrend(values) {
-            const n = values.length;
-            if (n < 2) return 0;
-            
-            // Create x coordinates (0, 1, 2, ...)
-            const xValues = Array.from({ length: n }, (_, i) => i);
-            
-            // Calculate means
-            const xMean = (n - 1) / 2; // Arithmetic progression mean
-            const yMean = calculateAverage(values);
-            
-            // Calculate slope (sum of (x-xMean)(y-yMean)) / sum of (x-xMean)^2
-            let numerator = 0;
-            let denominator = 0;
-            
-            for (let i = 0; i < n; i++) {
-                const xDiff = i - xMean;
-                const yDiff = values[i] - yMean;
-                numerator += xDiff * yDiff;
-                denominator += xDiff * xDiff;
-            }
-            
-            return denominator !== 0 ? numerator / denominator : 0;
-        }
-
-// Draw trend visualization chart
-function drawTrendChart(sensorType, chartElementId, recentData, trend) {
-    const canvas = document.getElementById(chartElementId);
-    const ctx = canvas.getContext('2d');
-    
-    // Clear previous chart
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Extract values and timestamps
-    const values = recentData.map(point => point.value);
-    const timestamps = recentData.map(point => {
-        const date = new Date(point.timestamp);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     });
-    
-    // Draw historical data
-    drawChart(ctx, values, timestamps, canvas.width, canvas.height, '#0d6efd');
-    
-    // Draw trend line
-    const graphWidth = canvas.width - 60;
-    const graphHeight = canvas.height - 60;
-    
-    // Calculate min and max for y-axis
-    let minVal = Math.min(...values);
-    let maxVal = Math.max(...values);
-    const range = maxVal - minVal;
-    minVal = minVal - range * 0.1;
-    maxVal = maxVal + range * 0.1;
-    
-    // Get last point coordinates
-    const lastValue = values[values.length - 1];
-    const lastX = 40 + (values.length - 1) * (graphWidth / (values.length - 1));
-    const lastY = graphHeight - ((lastValue - minVal) / (maxVal - minVal) * graphHeight) + 20;
-    
-    // Draw trend prediction line
-    ctx.beginPath();
-    ctx.strokeStyle = trend > 0 ? '#198754' : (trend < 0 ? '#dc3545' : '#6c757d');
-    ctx.lineWidth = 2;
-    ctx.setLineDash([5, 3]);
-    
-    // Start from last data point
-    ctx.moveTo(lastX, lastY);
-    
-    // Project forward 20% of the graph
-    const projectionDistance = graphWidth * 0.2;
-    const projectionPoints = 5;
-    const stepX = projectionDistance / projectionPoints;
-    
-    for (let i = 1; i <= projectionPoints; i++) {
-        const x = lastX + i * stepX;
-        const projectedValue = lastValue + trend * i;
-        const y = graphHeight - ((projectedValue - minVal) / (maxVal - minVal) * graphHeight) + 20;
-        ctx.lineTo(x, y);
-    }
-    
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    // Add a label for the trend
-    ctx.fillStyle = trend > 0 ? '#198754' : (trend < 0 ? '#dc3545' : '#6c757d');
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText(trend > 0 ? '↗ Rising' : (trend < 0 ? '↘ Falling' : '→ Stable'), canvas.width - 10, 30);
-}
 
-// Update anomaly detection
-function updateAnomalyDetection() {
-    // Get sensitivity threshold
-    const thresholdSigma = parseFloat(document.getElementById('anomaly-threshold').value);
-    
-    // Get window size for analysis
-    const windowSize = parseInt(document.getElementById('anomaly-window').value || '50');
-    
-    // Find anomalies in all sensors
-    const anomalies = [];
-    for (const sensorType in sensorData) {
-        const sensorAnomalies = detectAnomalies(sensorType, thresholdSigma, windowSize);
-        anomalies.push(...sensorAnomalies);
-    }
-    
-    // Sort anomalies by timestamp (newest first)
-    anomalies.sort((a, b) => b.timestamp - a.timestamp);
-    
-    // Update anomalies list
-    updateAnomaliesList(anomalies);
-    
-    // Update anomaly chart
-    updateAnomalyChart();
-}
-
-// Detect anomalies in sensor data
-function detectAnomalies(sensorType, thresholdSigma, windowSize) {
-    // Check if we have enough data
-    if (!sensorData[sensorType] || sensorData[sensorType].length < windowSize) {
-        return [];
-    }
-    
-    // Get the most recent data points
-    const recentData = sensorData[sensorType].slice(-windowSize);
-    const values = recentData.map(point => point.value);
-    
-    // Calculate mean and standard deviation
-    const mean = calculateAverage(values);
-    const stdDev = calculateStandardDeviation(values);
-    
-    // Find points that deviate more than the threshold
-    const anomalies = [];
-    
-    for (let i = 0; i < recentData.length; i++) {
-        const deviation = Math.abs(recentData[i].value - mean) / stdDev;
-        
-        if (deviation > thresholdSigma) {
-            // This is an anomaly
-            anomalies.push({
-                sensorType: sensorType,
-                dataPoint: recentData[i],
-                deviation: deviation,
-                index: i,
-                timestamp: recentData[i].timestamp
-            });
+    const humidityChart = new Chart(document.getElementById('humidityChart'), {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Humidity (%)',
+                data: humidityData,
+                borderColor: '#0288d1',
+                backgroundColor: 'rgba(3, 169, 244, 0.1)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#0288d1',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
+                }
+            },
+            plugins: { legend: { display: false } },
+            animation: { duration: 500 }
         }
-    }
-    
-    return anomalies;
-}
-
-// Calculate standard deviation
-function calculateStandardDeviation(values) {
-    const n = values.length;
-    if (n < 2) return 0;
-    
-    const mean = calculateAverage(values);
-    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
-    
-    return Math.sqrt(variance);
-}
-
-// Update anomalies list display
-function updateAnomaliesList(anomalies) {
-    const anomaliesList = document.getElementById('anomalies-list');
-    
-    if (anomalies.length === 0) {
-        anomaliesList.innerHTML = `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">No anomalies detected</h6>
-                </div>
-                <p class="mb-1">All sensor readings are within normal ranges based on current sensitivity settings.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let anomaliesHtml = '';
-    
-    // Display the top 5 most recent anomalies
-    const recentAnomalies = anomalies.slice(0, 5);
-    
-    recentAnomalies.forEach(anomaly => {
-        const date = new Date(anomaly.timestamp);
-        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        // Format sensor name for display
-        const sensorName = anomaly.sensorType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase());
-        
-        // Determine unit based on sensor type
-        let unit = '';
-        switch(anomaly.sensorType) {
-            case 'temperature':
-                unit = '°C';
-                break;
-            case 'humidity':
-                unit = '%';
-                break;
-            case 'volume_liters':
-                unit = 'L';
-                break;
-            case 'vibration_level':
-                unit = 'units';
-                break;
-        }
-        
-        // Format deviation as number of sigmas
-        const sigmaLevel = anomaly.deviation.toFixed(1) + 'σ';
-        
-        anomaliesHtml += `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">${sensorName} Anomaly: ${anomaly.dataPoint.value.toFixed(1)}${unit}</h6>
-                    <small class="text-muted">${timeString}</small>
-                </div>
-                <p class="mb-1">Deviation of ${sigmaLevel} from the mean value.</p>
-            </div>
-        `;
     });
-    
-    anomaliesList.innerHTML = anomaliesHtml;
-}
 
-// Update anomaly chart
-function updateAnomalyChart() {
-    const sensorType = document.getElementById('anomaly-sensor').value;
-    const thresholdSigma = parseFloat(document.getElementById('anomaly-threshold').value);
-    const windowSize = parseInt(document.getElementById('anomaly-window').value || '50');
-    
-    // Check if we have enough data
-    if (!sensorData[sensorType] || sensorData[sensorType].length < windowSize) {
-        return;
-    }
-    
-    // Get the most recent data points
-    const recentData = sensorData[sensorType].slice(-windowSize);
-    const values = recentData.map(point => point.value);
-    const timestamps = recentData.map(point => {
-        const date = new Date(point.timestamp);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const soilMoistureChart = new Chart(document.getElementById('soilMoistureChart'), {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [{
+                label: 'Soil Moisture',
+                data: soilMoistureData,
+                borderColor: '#5d4037',
+                backgroundColor: 'rgba(121, 85, 72, 0.1)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: '#5d4037',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 5 }
+                }
+            },
+            plugins: { legend: { display: false } },
+            animation: { duration: 500 }
+        }
     });
-    
-    // Calculate mean and standard deviation
-    const mean = calculateAverage(values);
-    const stdDev = calculateStandardDeviation(values);
-    
-    // Find anomaly indices
-    const anomalyIndices = [];
-    for (let i = 0; i < values.length; i++) {
-        const deviation = Math.abs(values[i] - mean) / stdDev;
-        if (deviation > thresholdSigma) {
-            anomalyIndices.push(i);
-        }
-    }
-    
-    // Draw the chart with anomalies
-    const canvas = document.getElementById('anomalies-chart');
-    const ctx = canvas.getContext('2d');
-    
-    // Clear previous chart
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw data line
-    drawAnomalyChart(ctx, values, timestamps, canvas.width, canvas.height, '#0d6efd', anomalyIndices, mean, stdDev, thresholdSigma);
-}
 
-// Draw chart with anomalies highlighted
-function drawAnomalyChart(ctx, data, labels, width, height, color, anomalyIndices, mean, stdDev, threshold) {
-    if (!data || data.length === 0) return;
-    
-    const graphWidth = width - 60;
-    const graphHeight = height - 60;
-    const stepX = graphWidth / (data.length - 1);
-    
-    // Calculate min and max values with some padding
-    let minVal = Math.min(...data);
-    let maxVal = Math.max(...data);
-    const range = maxVal - minVal;
-    minVal = minVal - range * 0.1;
-    maxVal = maxVal + range * 0.1;
-    
-    // Draw threshold lines
-    const upperThreshold = mean + threshold * stdDev;
-    const lowerThreshold = mean - threshold * stdDev;
-    
-    const upperY = graphHeight - ((upperThreshold - minVal) / (maxVal - minVal) * graphHeight) + 20;
-    const lowerY = graphHeight - ((lowerThreshold - minVal) / (maxVal - minVal) * graphHeight) + 20;
-    const meanY = graphHeight - ((mean - minVal) / (maxVal - minVal) * graphHeight) + 20;
-    
-    // Draw mean line
-    ctx.beginPath();
-    ctx.strokeStyle = '#6c757d';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.moveTo(40, meanY);
-    ctx.lineTo(graphWidth + 40, meanY);
-    ctx.stroke();
-    
-    // Draw upper threshold
-    ctx.beginPath();
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.moveTo(40, upperY);
-    ctx.lineTo(graphWidth + 40, upperY);
-    ctx.stroke();
-    
-    // Draw lower threshold
-    ctx.beginPath();
-    ctx.strokeStyle = '#dc3545';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.moveTo(40, lowerY);
-    ctx.lineTo(graphWidth + 40, lowerY);
-    ctx.stroke();
-    
-    ctx.setLineDash([]);
-    
-    // Draw the data line
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    
-    for (let i = 0; i < data.length; i++) {
-        const x = 40 + i * stepX;
-        const y = graphHeight - ((data[i] - minVal) / (maxVal - minVal) * graphHeight) + 20;
-        
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-        
-        // Highlight anomalies
-        if (anomalyIndices.includes(i)) {
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.fillStyle = '#dc3545';
-            ctx.arc(x, y, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.strokeStyle = color;
-        }
-    }
-    ctx.stroke();
-    
-    // Draw axes
-    ctx.beginPath();
-    ctx.strokeStyle = '#999';
-    ctx.lineWidth = 1;
-    ctx.moveTo(40, 20);
-    ctx.lineTo(40, graphHeight + 20);
-    ctx.lineTo(graphWidth + 40, graphHeight + 20);
-    ctx.stroke();
-    
-    // Label the Y axis
-    ctx.fillStyle = '#333';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText(maxVal.toFixed(1), 35, 25);
-    ctx.fillText(minVal.toFixed(1), 35, graphHeight + 15);
-    
-    // Label mean and thresholds
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#6c757d';
-    ctx.fillText(`Mean: ${mean.toFixed(1)}`, graphWidth + 45, meanY + 4);
-    ctx.fillStyle = '#dc3545';
-    ctx.fillText(`+${threshold}σ`, graphWidth + 45, upperY + 4);
-    ctx.fillText(`-${threshold}σ`, graphWidth + 45, lowerY + 4);
-    
-    // Label X axis
-    ctx.fillStyle = '#333';
-    ctx.textAlign = 'center';
-    if (labels && labels.length > 0) {
-        // Start
-        ctx.fillText(labels[0], 40, graphHeight + 40);
-        
-        // End
-        ctx.fillText(labels[labels.length - 1], 40 + (labels.length - 1) * stepX, graphHeight + 40);
-    }
-    
-    // Add legend for anomalies
-    if (anomalyIndices.length > 0) {
-        ctx.fillStyle = '#dc3545';
-        ctx.beginPath();
-        ctx.arc(100, 40, 6, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.fillStyle = '#333';
-        ctx.textAlign = 'left';
-        ctx.fillText('Anomaly', 110, 44);
-        
-        // Add count
-        ctx.fillText(`(${anomalyIndices.length} detected)`, 160, 44);
-    }
-}
+    // Function to update the charts with new data
+    function updateCharts(temperature, humidity, soilMoisture) {
+        const now = new Date();
+        const timeStr = formatTime(now);
 
-// Save analysis settings
-function saveAnalysisSettings() {
-    // Get values from form
-    const predictionWindow = parseInt(document.getElementById('prediction-window').value);
-    const predictionMethod = document.getElementById('prediction-method').value;
-    const updateInterval = parseInt(document.getElementById('update-interval').value);
-    const anomalyWindow = parseInt(document.getElementById('anomaly-window').value);
-    
-    // Update global settings object
-    analysisSettings = {
-        predictionWindow,
-        predictionMethod,
-        updateInterval,
-        anomalyWindow,
-        anomalyThreshold: parseFloat(document.getElementById('anomaly-threshold').value)
+        temperatureData.push(temperature);
+        humidityData.push(humidity);
+        soilMoistureData.push(soilMoisture);
+        timeLabels.push(timeStr);
+
+        if (temperatureData.length > maxDataPoints) {
+            temperatureData.shift();
+            humidityData.shift();
+            soilMoistureData.shift();
+            timeLabels.shift();
+        }
+
+        temperatureChart.data.labels = timeLabels;
+        temperatureChart.data.datasets[0].data = temperatureData;
+        temperatureChart.update();
+
+        humidityChart.data.labels = timeLabels;
+        humidityChart.data.datasets[0].data = humidityData;
+        humidityChart.update();
+
+        soilMoistureChart.data.labels = timeLabels;
+        soilMoistureChart.data.datasets[0].data = soilMoistureData;
+        soilMoistureChart.update();
+    }
+
+    // Connect to the WebSocket server
+    const socket = new WebSocket("ws://192.168.76.140:5000");
+
+    socket.onopen = function() {
+        document.getElementById("status").className = "status-indicator status-connected";
+        document.getElementById("status").innerHTML = '<i class="fas fa-check-circle"></i> Connected';
     };
-    
-    // Store settings in localStorage for persistence
-    localStorage.setItem('analysisSettings', JSON.stringify(analysisSettings));
-    
-    // Update chart update interval if needed
-    if (chartUpdateInterval) {
-        clearInterval(chartUpdateInterval);
-        chartUpdateInterval = setInterval(() => {
-            if (currentSection === 'predictive-analysis') {
-                updatePredictions();
-                updateAnomalyDetection();
-            }
-        }, updateInterval);
-    }
-    
-    // Show success message
-    const alertElement = document.getElementById('prediction-settings-alert');
-    alertElement.textContent = 'Analysis settings applied successfully!';
-    alertElement.classList.remove('d-none', 'alert-danger');
-    alertElement.classList.add('alert-success');
-    
-    setTimeout(() => {
-        alertElement.classList.add('d-none');
-    }, 3000);
-    
-    // Log settings change
-    logEvent("Settings updated", "Analysis settings have been applied");
-    
-    // Update predictions and anomaly detection
-    updatePredictions();
-    updateAnomalyDetection();
-}
 
-// Check for alert conditions
-function checkAlertConditions(data) {
-    // Get sensor settings
-    let settings;
-    try {
-        settings = JSON.parse(localStorage.getItem('sensorSettings')) || {};
-    } catch (e) {
-        settings = {};
-    }
-    
-    // Check each sensor for alarm conditions
-    if (data.temperature !== undefined) {
-        // Check high temperature alarm
-        if (settings.alarmTempHigh && data.temperature > settings.alarmTempHigh) {
-            addAlert('High Temperature', `Temperature has reached ${data.temperature.toFixed(1)}°C, exceeding the threshold of ${settings.alarmTempHigh}°C.`, 'high');
-        }
-        
-        // Check low temperature alarm
-        if (settings.alarmTempLow && data.temperature < settings.alarmTempLow) {
-            addAlert('Low Temperature', `Temperature has dropped to ${data.temperature.toFixed(1)}°C, below the threshold of ${settings.alarmTempLow}°C.`, 'high');
-        }
-    }
-    
-    // Check volume alarm
-    if (data.volume_liters !== undefined) {
-        if (settings.alarmVolumeHigh && data.volume_liters > settings.alarmVolumeHigh) {
-            addAlert('High Volume', `Volume has reached ${data.volume_liters.toFixed(1)}L, exceeding the threshold of ${settings.alarmVolumeHigh}L.`, 'high');
-        }
-    }
-    
-    // Check vibration alarm
-    if (data.vibration_level !== undefined) {
-        if (settings.alarmVibrationHigh && data.vibration_level > settings.alarmVibrationHigh) {
-            addAlert('High Vibration', `Vibration has reached ${data.vibration_level.toFixed(1)} units, exceeding the threshold of ${settings.alarmVibrationHigh} units.`, 'high');
-        }
-    }
-}
+    socket.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
 
-// Add alert to the system
-function addAlert(title, message, priority) {
-    // Check if notifications are enabled
-    let settings;
-    try {
-        settings = JSON.parse(localStorage.getItem('sensorSettings')) || {};
-    } catch (e) {
-        settings = {};
-    }
-    
-    if (settings.enableNotifications === false) {
-        return; // Notifications disabled
-    }
-    
-    // Check for duplicates (avoid spam)
-    const isDuplicate = systemAlerts.some(alert => 
-        alert.title === title && 
-        alert.message === message && 
-        new Date() - new Date(alert.timestamp) < 60000 // Within last minute
-    );
-    
-    if (isDuplicate) {
-        return; // Skip duplicate alerts
-    }
-    
-    // Create new alert
-    const alert = {
-        id: Date.now(),
-        title,
-        message,
-        priority,
-        timestamp: new Date().toISOString(),
-        acknowledged: false
+            // Update current sensor values on the dashboard
+            document.getElementById("temperature").innerHTML = data.temperature.toFixed(2) + '<span class="unit">°C</span>';
+            document.getElementById("humidity").innerHTML = data.humidity.toFixed(2) + '<span class="unit">%</span>';
+            document.getElementById("soilMoisture").innerHTML = data.soilMoisture;
+
+            // Update last updated time
+            lastUpdateTime = new Date();
+            document.getElementById("lastUpdated").innerText = formatTime(lastUpdateTime);
+
+            // Update charts with new data
+            updateCharts(data.temperature, data.humidity, data.soilMoisture);
+        } catch (error) {
+            console.error("JSON Parse Error:", error);
+        }
     };
-    
-    // Add to alerts array
-    systemAlerts.unshift(alert);
-    
-    // Limit to 100 alerts
-    if (systemAlerts.length > 100) {
-        systemAlerts.pop();
-    }
-    
-    // Update alerts display
-    updateAlertsDisplay();
-    
-    // Log the alert
-    logEvent(title, message, priority);
-    
-    // Show notification
-    showNotification(title, message, priority);
-}
 
-// Update alerts display
-function updateAlertsDisplay() {
-    const alertsList = document.getElementById('alerts-list');
-    
-    // If no alerts, show empty message
-    if (systemAlerts.length === 0) {
-        alertsList.innerHTML = `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">No active alerts</h6>
-                    <small class="text-muted">now</small>
-                </div>
-                <p class="mb-1">System is functioning normally. Alerts will appear here when sensor readings exceed thresholds.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Build alerts HTML
-    let alertsHtml = '';
-    
-    systemAlerts.forEach(alert => {
-        const timestamp = new Date(alert.timestamp);
-        const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        // Determine alert styling based on priority
-        let priorityClass = '';
-        if (alert.priority === 'high') {
-            priorityClass = 'border-danger';
-        } else if (alert.priority === 'medium') {
-            priorityClass = 'border-warning';
-        }
-        
-        alertsHtml += `
-            <div class="list-group-item ${priorityClass}" data-alert-id="${alert.id}">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">${alert.title}</h6>
-                    <small class="text-muted">${timeString}</small>
-                </div>
-                <p class="mb-1">${alert.message}</p>
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="acknowledgeAlert(${alert.id})">
-                        <i class="bi bi-check me-1"></i>Acknowledge
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-    
-    alertsList.innerHTML = alertsHtml;
-}
-
-// Acknowledge an alert
-function acknowledgeAlert(alertId) {
-    // Find the alert
-    const alertIndex = systemAlerts.findIndex(a => a.id === alertId);
-    
-    if (alertIndex !== -1) {
-        // Remove the alert
-        systemAlerts.splice(alertIndex, 1);
-        
-        // Update the display
-        updateAlertsDisplay();
-        
-        // Log the acknowledgement
-        logEvent("Alert acknowledged", `Alert ID ${alertId} has been acknowledged and cleared`);
-    }
-}
-
-// Clear all alerts
-function clearAlerts() {
-    // Clear the alerts array
-    systemAlerts = [];
-    
-    // Update the display
-    updateAlertsDisplay();
-    
-    // Log the event
-    logEvent("Alerts cleared", "All alerts have been cleared");
-}
-
-// Show notification
-function showNotification(title, message, priority) {
-    // Create a toast-like notification
-    const toast = document.createElement('div');
-    toast.className = 'connection-badge bg-primary text-white';
-    
-    if (priority === 'high') {
-        toast.className = 'connection-badge bg-danger text-white';
-    } else if (priority === 'medium') {
-        toast.className = 'connection-badge bg-warning text-dark';
-    }
-    
-    toast.innerHTML = `
-        <div><strong>${title}</strong></div>
-        <div>${message}</div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Remove after 5 seconds
-    setTimeout(() => {
-        toast.remove();
-    }, 5000);
-}
-
-// Log an event
-function logEvent(title, description, level = 'info') {
-    // Create event object
-    const event = {
-        id: Date.now(),
-        title,
-        description,
-        level,
-        timestamp: new Date().toISOString()
+    socket.onerror = function() {
+        document.getElementById("status").className = "status-indicator status-error";
+        document.getElementById("status").innerHTML = '<i class="fas fa-exclamation-triangle"></i> WebSocket Error';
     };
-    
-    // Add to event log
-    eventLog.unshift(event);
-    
-    // Limit to 1000 events
-    if (eventLog.length > 1000) {
-        eventLog.pop();
-    }
-    
-    // Update event log display if visible
-    updateEventLogDisplay();
-}
 
-// Update event log display
-function updateEventLogDisplay() {
-    const eventsList = document.getElementById('events-list');
-    
-    // If element doesn't exist or not visible, skip update
-    if (!eventsList || currentSection !== 'messages' || document.getElementById('events-tab-pane').classList.contains('d-none')) {
-        return;
-    }
-    
-    // Build events HTML
-    let eventsHtml = '';
-    
-    // Show last 50 events
-    const recentEvents = eventLog.slice(0, 50);
-    
-    recentEvents.forEach(event => {
-        const timestamp = new Date(event.timestamp);
-        const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        // Determine styling based on level
-        let levelClass = '';
-        if (event.level === 'error' || event.level === 'high') {
-            levelClass = 'text-danger';
-        } else if (event.level === 'warning' || event.level === 'medium') {
-            levelClass = 'text-warning';
-        }
-        
-        eventsHtml += `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1 ${levelClass}">${event.title}</h6>
-                    <small class="text-muted">${timeString}</small>
-                </div>
-                <p class="mb-1">${event.description}</p>
-                <small class="text-muted">System event</small>
-            </div>
-        `;
-    });
-    
-    eventsList.innerHTML = eventsHtml;
-}
-
-// Export event log
-function exportEventLog() {
-    // Check if we have events
-    if (eventLog.length === 0) {
-        showNotification("No Events", "There are no events to export.", "medium");
-        return;
-    }
-    
-    // Create CSV content
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Timestamp,Title,Description,Level\n";
-    
-    // Add events
-    eventLog.forEach(event => {
-        csvContent += `"${event.timestamp}","${event.title}","${event.description}","${event.level}"\n`;
-    });
-    
-    // Create and trigger download
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `event_log_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
-    document.body.appendChild(link);
-    
-    link.click();
-    document.body.removeChild(link);
-    
-    // Log export event
-    logEvent("Event log exported", `${eventLog.length} events exported to CSV`);
-}
-
-// Save notification settings
-function saveNotificationSettings() {
-    // Get values from form
-    const enableAlerts = document.getElementById('enable-alerts').checked;
-    const notifyTemperature = document.getElementById('notify-temperature').checked;
-    const notifyHumidity = document.getElementById('notify-humidity').checked;
-    const notifyVolume = document.getElementById('notify-volume').checked;
-    const notifyVibration = document.getElementById('notify-vibration').checked;
-    const alertCooldown = parseInt(document.getElementById('alert-cooldown').value);
-    
-    // Save settings
-    const settings = {
-        enableAlerts,
-        notifyTemperature,
-        notifyHumidity,
-        notifyVolume,
-        notifyVibration,
-        alertCooldown
+    socket.onclose = function() {
+        document.getElementById("status").className = "status-indicator status-disconnected";
+        document.getElementById("status").innerHTML = '<i class="fas fa-times-circle"></i> Disconnected';
     };
-    
-    // Store settings in localStorage
-    localStorage.setItem('notificationSettings', JSON.stringify(settings));
-    
-    // Show success message
-    const alertElement = document.getElementById('notification-settings-alert');
-    alertElement.textContent = 'Notification settings saved successfully!';
-    alertElement.classList.remove('d-none', 'alert-danger');
-    alertElement.classList.add('alert-success');
-    
-    setTimeout(() => {
-        alertElement.classList.add('d-none');
-    }, 3000);
-    
-    // Log settings change
-    logEvent("Settings updated", "Notification settings have been saved");
-}
 
-// Submit contact form
-function submitContactForm() {
-    // Get form values
-    const name = document.getElementById('contact-name').value;
-    const email = document.getElementById('contact-email').value;
-    const subject = document.getElementById('contact-subject').value;
-    const message = document.getElementById('contact-message').value;
-    
-    // Validate form
-    if (!name || !email || !message) {
-        const alertElement = document.getElementById('contact-alert');
-        alertElement.textContent = 'Please fill in all required fields.';
-        alertElement.classList.remove('d-none', 'alert-success');
-        alertElement.classList.add('alert-danger');
-        return;
-    }
-    
-    // Simple email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        const alertElement = document.getElementById('contact-alert');
-        alertElement.textContent = 'Please enter a valid email address.';
-        alertElement.classList.remove('d-none', 'alert-success');
-        alertElement.classList.add('alert-danger');
-        return;
-    }
-    
-    // In a real implementation, this would send data to the server
-    // For this demo, we'll just log it and show a success message
-    
-    // Log the submission
-    logEvent("Contact form submitted", `From: ${name} (${email}), Subject: ${subject}`);
-    
-    // Show success message
-    const alertElement = document.getElementById('contact-alert');
-    alertElement.textContent = 'Your message has been sent. We\'ll respond as soon as possible.';
-    alertElement.classList.remove('d-none', 'alert-danger');
-    alertElement.classList.add('alert-success');
-    
-    // Clear form
-    document.getElementById('contact-name').value = '';
-    document.getElementById('contact-email').value = '';
-    document.getElementById('contact-message').value = '';
-    
-    setTimeout(() => {
-        alertElement.classList.add('d-none');
-    }, 3000);
-}
-
-// Load saved settings from localStorage
-function loadSavedSettings() {
-    // Load sensor settings
-    try {
-        const sensorSettings = JSON.parse(localStorage.getItem('sensorSettings'));
-        if (sensorSettings) {
-            document.getElementById('temp-calibration').value = sensorSettings.tempCalibration || 0;
-            document.getElementById('humidity-calibration').value = sensorSettings.humidityCalibration || 0;
-            document.getElementById('alarm-temp-high').value = sensorSettings.alarmTempHigh || 40;
-            document.getElementById('alarm-temp-low').value = sensorSettings.alarmTempLow || 5;
-            document.getElementById('alarm-volume-high').value = sensorSettings.alarmVolumeHigh || 100;
-            document.getElementById('alarm-vibration-high').value = sensorSettings.alarmVibrationHigh || 20;
-            document.getElementById('enable-notifications').checked = sensorSettings.enableNotifications !== false;
-        }
-    } catch (e) {
-        console.error("Error loading sensor settings:", e);
-    }
-    
-    // Load analysis settings
-    try {
-        const savedAnalysisSettings = JSON.parse(localStorage.getItem('analysisSettings'));
-        if (savedAnalysisSettings) {
-            document.getElementById('prediction-window').value = savedAnalysisSettings.predictionWindow || 50;
-            document.getElementById('prediction-method').value = savedAnalysisSettings.predictionMethod || 'moving-avg';
-            document.getElementById('update-interval').value = savedAnalysisSettings.updateInterval || 5000;
-            document.getElementById('anomaly-window').value = savedAnalysisSettings.anomalyWindow || 50;
-            document.getElementById('anomaly-threshold').value = savedAnalysisSettings.anomalyThreshold || 2;
-            
-            // Update global settings
-            analysisSettings = savedAnalysisSettings;
-        }
-    } catch (e) {
-        console.error("Error loading analysis settings:", e);
-    }
-    
-    // Load notification settings
-    try {
-        const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings'));
-        if (notificationSettings) {
-            document.getElementById('enable-alerts').checked = notificationSettings.enableAlerts !== false;
-            document.getElementById('notify-temperature').checked = notificationSettings.notifyTemperature !== false;
-            document.getElementById('notify-humidity').checked = notificationSettings.notifyHumidity !== false;
-            document.getElementById('notify-volume').checked = notificationSettings.notifyVolume !== false;
-            document.getElementById('notify-vibration').checked = notificationSettings.notifyVibration !== false;
-            document.getElementById('alert-cooldown').value = notificationSettings.alertCooldown || 30;
-        }
-    } catch (e) {
-        console.error("Error loading notification settings:", e);
-    }
-}
-
-// Call loadSavedSettings when the app initializes
-document.addEventListener('DOMContentLoaded', loadSavedSettings);
-
-// Example of how to generate mock data for testing without real WebSocket connection
-function generateMockData() {
-    // Base values for each sensor
-    const baseValues = {
-        temperature: 22,
-        humidity: 45,
-        volume_liters: 50,
-        vibration_level: 5
-    };
-    
-    // Create variations around the base values
-    const data = {};
-    
-    for (const sensor in baseValues) {
-        // Add random variation (±5% of base value)
-        const variation = baseValues[sensor] * 0.05;
-        data[sensor] = baseValues[sensor] + (Math.random() * variation * 2 - variation);
-        
-        // Add sine wave variation for temperature (simulate day/night cycle)
-        if (sensor === 'temperature') {
-            const hourOfDay = new Date().getHours();
-            const dayNightCycle = Math.sin((hourOfDay / 24) * 2 * Math.PI);
-            data[sensor] += dayNightCycle * 3; // ±3°C variation throughout the day
-        }
-        
-        // Occasionally add outliers for testing anomaly detection (1% chance)
-        if (Math.random() < 0.01) {
-            data[sensor] *= (Math.random() < 0.5) ? 1.5 : 0.5; // 50% up or down
-        }
-    }
-    
-    return data;
-}
-
-// Function to simulate WebSocket messages for testing
-function startMockDataGeneration() {
-    // Create a mocked WebSocket message event
-    const mockMessageEvent = {
-        data: JSON.stringify(generateMockData())
-    };
-    
-    // Handle the mock message
-    handleWebSocketMessage(mockMessageEvent);
-    
-    // Schedule the next mock message
-    setTimeout(startMockDataGeneration, 1000); // Send mock data every second
-}
-
-// Uncomment to use mock data generation for testing
-// setTimeout(startMockDataGeneration, 1000);
+    // Update uptime every second
+    setInterval(updateUptime, 1000);
 </script>
 </body>
 </html>
