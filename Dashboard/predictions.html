@@ -8,10 +8,9 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
-  <!-- Google Fonts - Inter for English and Noto Sans for Hindi -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts - For Hindi Support -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Hind:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
     :root {
       --primary-color: #2e7d32;
       --primary-color-dark: #005005;
@@ -35,68 +34,14 @@
     
     body {
       background-color: #f5f7fa;
-      font-family: 'Inter', 'Noto Sans', sans-serif;
+      font-family: 'Poppins', 'Hind', sans-serif;
       padding-bottom: 2rem;
       color: var(--text-color);
       line-height: 1.6;
     }
     
-    /* Language specific font adjustments */
-    html[lang="hi"] body {
-      font-family: 'Noto Sans', sans-serif;
-    }
-    
-    html[lang="en"] body {
-      font-family: 'Inter', sans-serif;
-    }
-    
-    .bg-agrisense {
-      background-color: var(--primary-color);
-      background-image: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
-    }
-    
-    .btn-agrisense {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-      color: white;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1.25rem;
-      font-weight: 500;
-      transition: var(--transition);
-    }
-    
-    .btn-agrisense:hover {
-      background-color: var(--primary-color-dark);
-      border-color: var(--primary-color-dark);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-    }
-    
-    /* Navbar Styles */
-    .navbar {
-      box-shadow: var(--shadow-sm);
-      padding: 0.75rem 0;
-    }
-    
-    .navbar-brand {
-      font-weight: 600;
-      font-size: 1.25rem;
-    }
-    
-    .navbar-brand i {
-      color: var(--primary-color-light);
-    }
-    
-    .nav-link {
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      transition: var(--transition);
-    }
-    
-    .nav-link:hover, .nav-link.active {
-      background-color: rgba(255, 255, 255, 0.1);
+    body.hindi {
+      font-family: 'Hind', 'Poppins', sans-serif;
     }
     
     /* Style adjustments to match index page */
@@ -122,6 +67,86 @@
     
     .dropdown-item.language-option:hover {
       background-color: rgba(46, 125, 50, 0.1);
+    }
+    
+    .bg-agrisense {
+      background-color: var(--primary-color);
+      background-image: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+    }
+    
+    .btn-agrisense {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-agrisense:hover {
+      background-color: var(--primary-color-dark);
+      border-color: var(--primary-color-dark);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* Connection status */
+    .connection-status {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+      position: relative;
+    }
+    
+    .status-online, .status-connected {
+      background-color: #2ecc71;
+      box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+      animation: pulse 2s infinite;
+    }
+    
+    .status-offline, .status-disconnected, .status-error {
+      background-color: #e74c3c;
+      box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+    }
+    
+    .status-connecting {
+      background-color: #f39c12;
+      box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.2);
+      animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+      }
+    }
+    
+    .last-update {
+      font-size: 0.85rem;
+      color: #6c757d;
+      font-weight: 400;
+      margin-bottom: 1rem;
     }
     
     /* Container styles for predictions page */
@@ -313,6 +338,31 @@
       color: var(--danger-color);
     }
     
+    /* Sensor input form */
+    .sensor-form-container {
+      margin-bottom: 2rem;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-color-light);
+      box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+    }
+    
+    /* Notification styling */
+    #notificationArea {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+      max-width: 350px;
+    }
+    
+    .alert {
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-md);
+      opacity: 0.95;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 992px) {
       .dashboard-container {
@@ -320,13 +370,17 @@
       }
     }
     
-          @media (max-width: 768px) {
+    @media (max-width: 768px) {
       .stats-container {
         grid-template-columns: 1fr;
       }
       
       .chart-card {
         padding: 1rem;
+      }
+      
+      .form-group {
+        margin-bottom: 1rem;
       }
     }
   </style>
@@ -375,10 +429,65 @@
 
   <!-- Predictions Page Content -->
   <div class="container dashboard-container">
-    <div class="row mb-4">
+    <div class="row mb-3">
       <div class="col">
         <h1 class="h3 mb-0" data-i18n="page.title">Plant Growth Predictions</h1>
         <p class="text-muted" data-i18n="page.subtitle">Real-time growth analysis and health monitoring</p>
+      </div>
+    </div>
+    
+    <!-- Connection Status -->
+    <div class="row mb-3">
+      <div class="col">
+        <div id="connectionStatus" class="connection-status">
+          <div class="status-indicator status-connecting"></div>
+          <span data-i18n="status.connecting">Connecting to ML server...</span>
+        </div>
+        <div id="lastUpdateTime" class="last-update">
+          <span data-i18n="lastUpdate">Last update</span>: <span data-i18n="never">Never</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sensor Input Form -->
+    <div class="chart-card sensor-form-container">
+      <div class="card-header">
+        <h5 class="card-title">
+          <i class="bi bi-sliders"></i>
+          <span data-i18n="sensor.title">Sensor Readings</span>
+        </h5>
+      </div>
+      <div class="card-body">
+        <form id="sensorForm" class="row g-3">
+          <div class="col-md-4">
+            <label for="Temperature(C)" class="form-label" data-i18n="sensor.temperature">Temperature (°C)</label>
+            <input type="number" class="form-control" id="Temperature(C)" min="10" max="40" step="0.1" value="25.0" required>
+          </div>
+          <div class="col-md-4">
+            <label for="Humidity(%)" class="form-label" data-i18n="sensor.humidity">Humidity (%)</label>
+            <input type="number" class="form-control" id="Humidity(%)" min="0" max="100" step="0.1" value="60.0" required>
+          </div>
+          <div class="col-md-4">
+            <label for="SoilMoisture(%)" class="form-label" data-i18n="sensor.soilMoisture">Soil Moisture (%)</label>
+            <input type="number" class="form-control" id="SoilMoisture(%)" min="0" max="100" step="0.1" value="45.0" required>
+          </div>
+          <div class="col-md-4">
+            <label for="LightIntensity(lux)" class="form-label" data-i18n="sensor.lightIntensity">Light Intensity (lux)</label>
+            <input type="number" class="form-control" id="LightIntensity(lux)" min="0" max="50000" step="100" value="8000" required>
+          </div>
+          <div class="col-md-4">
+            <label for="SoilpH" class="form-label" data-i18n="sensor.soilPh">Soil pH</label>
+            <input type="number" class="form-control" id="SoilpH" min="4" max="9" step="0.1" value="6.5" required>
+          </div>
+          <div class="col-md-4">
+            <label for="DaysSincePlanting" class="form-label" data-i18n="sensor.daysPlanted">Days Since Planting</label>
+            <input type="number" class="form-control" id="DaysSincePlanting" min="1" max="200" value="30" required>
+          </div>
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-agrisense" data-i18n="sensor.predict">Predict Growth</button>
+            <button type="button" id="autoFillBtn" class="btn btn-outline-secondary ms-2" data-i18n="sensor.autoFill">Auto-Fill</button>
+          </div>
+        </form>
       </div>
     </div>
     
@@ -398,14 +507,14 @@
         </div>
       </div>
       <div class="stat-card">
+        <div class="stat-title" data-i18n="stats.predictedHeight">Predicted Height</div>
+        <div id="predictedHeight" class="stat-value">--</div>
+        <div class="text-muted small" data-i18n="stats.inDays">in coming days</div>
+      </div>
+      <div class="stat-card">
         <div class="stat-title" data-i18n="stats.growthRate">Growth Rate</div>
         <div id="growthRate" class="stat-value">--</div>
         <div class="text-muted small" data-i18n="stats.cmPerDay">cm per day</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title" data-i18n="stats.predictionAccuracy">Prediction Accuracy</div>
-        <div id="predictionAccuracy" class="stat-value">95%</div>
-        <div class="text-muted small" data-i18n="stats.basedOnHistorical">based on historical data</div>
       </div>
     </div>
     
@@ -439,10 +548,13 @@
         </h5>
       </div>
       <div id="recommendationsContainer">
-        <p class="text-muted text-center" data-i18n="recommendations.loading">Loading recommendations...</p>
+        <p class="text-muted text-center" data-i18n="recommendations.loading">Submit sensor data to get recommendations</p>
       </div>
     </div>
   </div>
+
+  <!-- Notification Area -->
+  <div id="notificationArea"></div>
 
   <!-- Bootstrap JS Bundle with Popper -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -460,33 +572,33 @@
         "page.title": "Plant Growth Predictions",
         "page.subtitle": "Real-time growth analysis and health monitoring",
         "stats.currentHeight": "Current Height",
+        "stats.predictedHeight": "Predicted Height",
+        "stats.inDays": "in coming days",
         "stats.growthRate": "Growth Rate",
         "stats.cmPerDay": "cm per day",
-        "stats.predictionAccuracy": "Prediction Accuracy",
-        "stats.basedOnHistorical": "based on historical data",
         "chart.title": "Plant Growth Trajectory",
         "chart.refresh": "Refresh",
         "recommendations.title": "Recommendations",
-        "recommendations.loading": "Loading recommendations...",
+        "recommendations.loading": "Submit sensor data to get recommendations",
         "health.status.healthy": "Plant Status: Healthy",
-        "health.status.sick": "Plant Status: Sick",
-        "health.status.unknown": "Plant Status: Unknown",
-        "health.desc.healthy": "All parameters within optimal ranges",
-        "health.desc.sick": "Detected issue:",
-        "health.desc.unknown": "Unable to determine current health status",
+        "health.status.sick": "Plant Status: At Risk",
+        "health.status.unknown": "Plant Status: Needs Assessment",
+        "health.desc.healthy": "Growth is on track with expected ranges",
+        "health.desc.sick": "Growth is below expected rate",
+        "health.desc.unknown": "Insufficient data to determine health status",
         "health.button.details": "View Details",
         "health.button.check": "Check Now",
-        "error.loading": "Unable to load prediction data. Please try again later.",
+        "error.loading": "Unable to load prediction data. Please try again.",
         "recommendations.waterSchedule": "Maintain Watering Schedule",
         "recommendations.waterDesc": "Current watering pattern is supporting healthy growth.",
         "recommendations.light": "Light Exposure",
         "recommendations.lightDesc": "Continue with current light conditions for optimal photosynthesis.",
         "recommendations.fertilizer": "Next Fertilizer Application",
         "recommendations.fertilizerDesc": "Schedule next fertilizer application in 7 days.",
-        "recommendations.treatment": "Treat",
-        "recommendations.treatmentDesc": "Apply recommended treatment immediately.",
+        "recommendations.treatment": "Adjust Conditions",
+        "recommendations.treatmentDesc": "Current growth rate is below expected range.",
         "recommendations.humidity": "Adjust Humidity",
-        "recommendations.humidityDesc": "Increase surrounding humidity to aid recovery.",
+        "recommendations.humidityDesc": "Increase surrounding humidity to aid growth.",
         "recommendations.monitor": "Monitor Closely",
         "recommendations.monitorDesc": "Check plant status daily for the next week.",
         "recommendations.moreData": "Gather More Data",
@@ -494,7 +606,24 @@
         "chart.xAxis": "Time (Days)",
         "chart.yAxis": "Plant Height (cm)",
         "chart.dataLabel": "Plant Height (cm)",
-        "trend.noChange": "No change"
+        "trend.noChange": "No change",
+        "status.connecting": "Connecting to ML server...",
+        "status.connected": "Connected to ML server",
+        "status.disconnected": "Disconnected from ML server",
+        "status.error": "Connection error",
+        "lastUpdate": "Last update",
+        "never": "Never",
+        "sensor.title": "Sensor Readings",
+        "sensor.temperature": "Temperature (°C)",
+        "sensor.humidity": "Humidity (%)",
+        "sensor.soilMoisture": "Soil Moisture (%)",
+        "sensor.lightIntensity": "Light Intensity (lux)",
+        "sensor.soilPh": "Soil pH",
+        "sensor.daysPlanted": "Days Since Planting",
+        "sensor.predict": "Predict Growth",
+        "sensor.autoFill": "Auto-Fill",
+        "prediction.success": "Prediction successful",
+        "prediction.error": "Prediction failed"
       },
       hi: {
         "navbar.brand": "एग्रीसेंस डैशबोर्ड",
@@ -505,33 +634,33 @@
         "page.title": "पौधे की वृद्धि पूर्वानुमान",
         "page.subtitle": "वास्तविक समय वृद्धि विश्लेषण और स्वास्थ्य निगरानी",
         "stats.currentHeight": "वर्तमान ऊंचाई",
+        "stats.predictedHeight": "अनुमानित ऊंचाई",
+        "stats.inDays": "आने वाले दिनों में",
         "stats.growthRate": "वृद्धि दर",
         "stats.cmPerDay": "सेमी प्रति दिन",
-        "stats.predictionAccuracy": "पूर्वानुमान सटीकता",
-        "stats.basedOnHistorical": "ऐतिहासिक डेटा के आधार पर",
         "chart.title": "पौधे की वृद्धि प्रक्षेपवक्र",
         "chart.refresh": "रिफ्रेश करें",
         "recommendations.title": "अनुशंसाएँ",
-        "recommendations.loading": "अनुशंसाएँ लोड हो रही हैं...",
+        "recommendations.loading": "अनुशंसाएँ प्राप्त करने के लिए सेंसर डेटा जमा करें",
         "health.status.healthy": "पौधे की स्थिति: स्वस्थ",
-        "health.status.sick": "पौधे की स्थिति: अस्वस्थ",
-        "health.status.unknown": "पौधे की स्थिति: अज्ञात",
-        "health.desc.healthy": "सभी पैरामीटर इष्टतम सीमा के भीतर",
-        "health.desc.sick": "पहचानी गई समस्या:",
-        "health.desc.unknown": "वर्तमान स्वास्थ्य स्थिति निर्धारित करने में असमर्थ",
+        "health.status.sick": "पौधे की स्थिति: जोखिम में",
+        "health.status.unknown": "पौधे की स्थिति: मूल्यांकन आवश्यक",
+        "health.desc.healthy": "वृद्धि अपेक्षित सीमाओं के साथ चल रही है",
+        "health.desc.sick": "वृद्धि अपेक्षित दर से कम है",
+        "health.desc.unknown": "स्वास्थ्य स्थिति निर्धारित करने के लिए अपर्याप्त डेटा",
         "health.button.details": "विवरण देखें",
         "health.button.check": "अभी जांचें",
-        "error.loading": "पूर्वानुमान डेटा लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।",
+        "error.loading": "पूर्वानुमान डेटा लोड करने में असमर्थ। कृपया पुनः प्रयास करें।",
         "recommendations.waterSchedule": "पानी देने की अनुसूची बनाए रखें",
         "recommendations.waterDesc": "वर्तमान पानी देने का पैटर्न स्वस्थ विकास का समर्थन कर रहा है।",
         "recommendations.light": "प्रकाश एक्सपोज़र",
         "recommendations.lightDesc": "इष्टतम प्रकाश संश्लेषण के लिए वर्तमान प्रकाश स्थितियों को जारी रखें।",
         "recommendations.fertilizer": "अगला उर्वरक अनुप्रयोग",
         "recommendations.fertilizerDesc": "7 दिनों में अगला उर्वरक लगाने की अनुसूची बनाएं।",
-        "recommendations.treatment": "उपचार करें",
-        "recommendations.treatmentDesc": "अनुशंसित उपचार तुरंत लागू करें।",
+        "recommendations.treatment": "स्थितियों को समायोजित करें",
+        "recommendations.treatmentDesc": "वर्तमान वृद्धि दर अपेक्षित सीमा से कम है।",
         "recommendations.humidity": "आर्द्रता समायोजित करें",
-        "recommendations.humidityDesc": "ठीक होने में सहायता के लिए आसपास की आर्द्रता बढ़ाएं।",
+        "recommendations.humidityDesc": "वृद्धि में सहायता के लिए आसपास की आर्द्रता बढ़ाएं।",
         "recommendations.monitor": "बारीकी से निगरानी करें",
         "recommendations.monitorDesc": "अगले सप्ताह के लिए दैनिक पौधे की स्थिति की जांच करें।",
         "recommendations.moreData": "अधिक डेटा एकत्र करें",
@@ -539,11 +668,46 @@
         "chart.xAxis": "समय (दिन)",
         "chart.yAxis": "पौधे की ऊंचाई (सेमी)",
         "chart.dataLabel": "पौधे की ऊंचाई (सेमी)",
-        "trend.noChange": "कोई परिवर्तन नहीं"
+        "trend.noChange": "कोई परिवर्तन नहीं",
+        "status.connecting": "ML सर्वर से कनेक्ट हो रहा है...",
+        "status.connected": "ML सर्वर से जुड़ा हुआ है",
+        "status.disconnected": "ML सर्वर से डिस्कनेक्ट",
+        "status.error": "कनेक्शन त्रुटि",
+        "lastUpdate": "अंतिम अपडेट",
+        "never": "कभी नहीं",
+        "sensor.title": "सेंसर पठन",
+        "sensor.temperature": "तापमान (°C)",
+        "sensor.humidity": "आर्द्रता (%)",
+        "sensor.soilMoisture": "मिट्टी की नमी (%)",
+        "sensor.lightIntensity": "प्रकाश की तीव्रता (lux)",
+        "sensor.soilPh": "मिट्टी का पीएच",
+        "sensor.daysPlanted": "रोपण के बाद दिन",
+        "sensor.predict": "वृद्धि का अनुमान लगाएं",
+        "sensor.autoFill": "स्वतः भरें",
+        "prediction.success": "पूर्वानुमान सफल",
+        "prediction.error": "पूर्वानुमान विफल रहा"
       }
     };
     
-    // Language management
+    // WebSocket connection parameters
+    const wsHost = "192.168.76.140";
+    const wsPort = "8765";
+    let ws = null;
+    let reconnectTimer = null;
+    const reconnectInterval = 5000;
+    
+    // Chart instance
+    let growthChart = null;
+    
+    // Prediction data storage
+    let predictionHistory = [];
+    let lastPrediction = null;
+    
+    // Expected growth rate range (cm per day)
+    const EXPECTED_GROWTH_MIN = 1.8;
+    const EXPECTED_GROWTH_MAX = 2.5;
+    
+    // Current language
     let currentLang = localStorage.getItem('agrisense-lang') || 'en';
     
     // Initialize language
@@ -559,6 +723,9 @@
         document.documentElement.lang = currentLang;
         translatePage();
         updateGrowthChart(); // Update chart labels
+        
+        // Update connection status text based on new language
+        updateConnectionStatusText(ws ? ws.readyState : WebSocket.CONNECTING);
       });
     });
     
@@ -590,34 +757,255 @@
     }
     
     /**
-     * Fetch real-time prediction data from the backend.
-     * Expected JSON format:
-     * {
-     *   "labels": ["Day 1", "Day 2", "Day 3", ...],
-     *   "values": [5, 12, 20, ...],
-     *   "status": "healthy" // or "sick"
-     *   "disease": "Disease Name" // present only if status is "sick"
-     * }
+     * WebSocket initialization and message handling
      */
-    async function fetchPredictions() {
+    function initWebSocket() {
+      // Close existing connection if any
+      if (ws) {
+        ws.close();
+      }
+      
+      // Update connection status
+      updateConnectionStatusText(WebSocket.CONNECTING);
+      
       try {
-        const response = await fetch('/api/predictions');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data;
+        // Create WebSocket connection to the server
+        ws = new WebSocket(`ws://${wsHost}:${wsPort}`);
+        
+        // Connection opened handler
+        ws.onopen = function(event) {
+          console.log("WebSocket connection established");
+          updateConnectionStatusText(WebSocket.OPEN);
+          
+          // Clear any reconnection timer
+          if (reconnectTimer) {
+            clearTimeout(reconnectTimer);
+            reconnectTimer = null;
+          }
+          
+          // Show notification
+          showNotification(getTranslation("status.connected"), "success");
+        };
+        
+        // Message received handler
+        ws.onmessage = function(event) {
+          console.log("Data received from server:", event.data);
+          try {
+            // Parse the received JSON data
+            const data = JSON.parse(event.data);
+            
+            // Process the prediction response
+            processPredictionResponse(data);
+            
+          } catch (error) {
+            console.error("Error processing message:", error);
+            showNotification(getTranslation("prediction.error"), "danger");
+          }
+        };
+        
+        // Error handler
+        ws.onerror = function(event) {
+          console.error("WebSocket error observed:", event);
+          updateConnectionStatusText(WebSocket.CLOSED);
+          showNotification(getTranslation("status.error"), "danger");
+        };
+        
+        // Connection closed handler
+        ws.onclose = function(event) {
+          console.log("WebSocket connection closed. Code:", event.code);
+          updateConnectionStatusText(WebSocket.CLOSED);
+          
+          // Schedule reconnection
+          reconnectTimer = setTimeout(function() {
+            console.log("Attempting to reconnect...");
+            initWebSocket();
+          }, reconnectInterval);
+        };
+        
       } catch (error) {
-        console.error('Error fetching predictions:', error);
-        return { labels: [], values: [], status: "unknown", disease: "" };
+        console.error("Error creating WebSocket:", error);
+        updateConnectionStatusText(WebSocket.CLOSED);
+        showNotification(getTranslation("status.error"), "danger");
+        
+        // Schedule reconnection
+        reconnectTimer = setTimeout(function() {
+          console.log("Attempting to reconnect after error...");
+          initWebSocket();
+        }, reconnectInterval);
       }
     }
-
-    // Chart instance variable
-    let growthChart;
-
+    
     /**
-     * Initialize the Chart.js chart.
+     * Update connection status display based on WebSocket state
+     */
+    function updateConnectionStatusText(readyState) {
+      const statusContainer = document.getElementById('connectionStatus');
+      const indicator = statusContainer.querySelector('div');
+      const textElement = statusContainer.querySelector('span');
+      
+      switch (readyState) {
+        case WebSocket.CONNECTING:
+          indicator.className = "status-indicator status-connecting";
+          textElement.textContent = getTranslation("status.connecting");
+          break;
+        case WebSocket.OPEN:
+          indicator.className = "status-indicator status-connected";
+          textElement.textContent = getTranslation("status.connected");
+          break;
+        case WebSocket.CLOSING:
+        case WebSocket.CLOSED:
+          indicator.className = "status-indicator status-disconnected";
+          textElement.textContent = getTranslation("status.disconnected");
+          break;
+        default:
+          indicator.className = "status-indicator status-error";
+          textElement.textContent = getTranslation("status.error");
+      }
+    }
+    
+    /**
+     * Update the last update time display
+     */
+    function updateLastUpdateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const lastUpdateElement = document.getElementById('lastUpdateTime');
+      lastUpdateElement.innerHTML = `${getTranslation('lastUpdate')}: ${timeString}`;
+    }
+    
+    /**
+     * Send sensor data to the ML model
+     */
+    function sendSensorData() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        // Gather sensor data from form
+        const sensorData = {
+          "Temperature(C)": parseFloat(document.getElementById('Temperature(C)').value),
+          "Humidity(%)": parseFloat(document.getElementById('Humidity(%)').value),
+          "SoilMoisture(%)": parseFloat(document.getElementById('SoilMoisture(%)').value),
+          "LightIntensity(lux)": parseFloat(document.getElementById('LightIntensity(lux)').value),
+          "SoilpH": parseFloat(document.getElementById('SoilpH').value),
+          "DaysSincePlanting": parseInt(document.getElementById('DaysSincePlanting').value)
+        };
+        
+        console.log("Sending sensor data:", sensorData);
+        
+        // Show loader
+        showLoader();
+        
+        // Send data to server
+        ws.send(JSON.stringify(sensorData));
+        
+        // Update last update time
+        updateLastUpdateTime();
+        
+        return true;
+      } else {
+        console.error("WebSocket not connected");
+        showNotification(getTranslation("status.disconnected"), "warning");
+        initWebSocket(); // Try to reconnect
+        return false;
+      }
+    }
+    
+    /**
+     * Process the prediction response from the server
+     */
+    function processPredictionResponse(data) {
+      hideLoader();
+      
+      if (data.status === "success" && data.predicted_height_cm !== undefined) {
+        // Store prediction with timestamp
+        const currentDays = parseInt(document.getElementById('DaysSincePlanting').value);
+        lastPrediction = {
+          height: data.predicted_height_cm,
+          days: currentDays,
+          timestamp: new Date()
+        };
+        
+        // Add to history if not duplicate
+        if (predictionHistory.length === 0 || 
+            predictionHistory[predictionHistory.length - 1].days !== currentDays) {
+          predictionHistory.push(lastPrediction);
+          
+          // Limit history size
+          if (predictionHistory.length > 20) {
+            predictionHistory.shift();
+          }
+        } else {
+          // Update last entry if same day
+          predictionHistory[predictionHistory.length - 1] = lastPrediction;
+        }
+        
+        // Update UI with prediction
+        updateUIWithPrediction(lastPrediction);
+        
+        // Show success notification
+        showNotification(getTranslation("prediction.success"), "success");
+      } else {
+        // Show error
+        console.error("Prediction error:", data);
+        showNotification(data.message || getTranslation("prediction.error"), "danger");
+      }
+    }
+    
+    /**
+     * Update UI with prediction data
+     */
+    function updateUIWithPrediction(prediction) {
+      // Update height display
+      document.getElementById('currentHeight').textContent = prediction.height.toFixed(1);
+      document.getElementById('predictedHeight').textContent = prediction.height.toFixed(1);
+      
+      // Calculate growth rate if we have multiple predictions
+      if (predictionHistory.length > 1) {
+        const sortedHistory = [...predictionHistory].sort((a, b) => a.days - b.days);
+        const growthRates = [];
+        
+        for (let i = 1; i < sortedHistory.length; i++) {
+          const daysDiff = sortedHistory[i].days - sortedHistory[i-1].days;
+          if (daysDiff > 0) {
+            const rate = (sortedHistory[i].height - sortedHistory[i-1].height) / daysDiff;
+            growthRates.push(rate);
+          }
+        }
+        
+        if (growthRates.length > 0) {
+          const avgGrowthRate = growthRates.reduce((sum, val) => sum + val, 0) / growthRates.length;
+          document.getElementById('growthRate').textContent = avgGrowthRate.toFixed(2);
+          
+          // Update height trend
+          const lastRate = growthRates[growthRates.length - 1];
+          const trendElement = document.getElementById('heightTrend');
+          
+          if (lastRate > 0) {
+            trendElement.innerHTML = `<i class="bi bi-arrow-up me-1 trend-up"></i><span class="trend-up">+${lastRate.toFixed(2)} cm/day</span>`;
+          } else if (lastRate < 0) {
+            trendElement.innerHTML = `<i class="bi bi-arrow-down me-1 trend-down"></i><span class="trend-down">${lastRate.toFixed(2)} cm/day</span>`;
+          } else {
+            trendElement.innerHTML = `<i class="bi bi-dash me-1"></i><span>${getTranslation('trend.noChange')}</span>`;
+          }
+          
+          // Determine health status based on growth rate
+          let healthStatus = "unknown";
+          if (avgGrowthRate >= EXPECTED_GROWTH_MIN && avgGrowthRate <= EXPECTED_GROWTH_MAX) {
+            healthStatus = "healthy";
+          } else if (avgGrowthRate < EXPECTED_GROWTH_MIN) {
+            healthStatus = "sick";
+          }
+          
+          // Update health status and recommendations
+          updateHealthStatus(healthStatus, "");
+          updateRecommendations(healthStatus, "", sortedHistory);
+        }
+      }
+      
+      // Generate and update chart
+      updateGrowthChart();
+    }
+    
+    /**
+     * Initialize the Chart.js chart
      */
     function initializeChart() {
       const ctx = document.getElementById('growthChart').getContext('2d');
@@ -649,7 +1037,7 @@
               position: 'top',
               labels: {
                 font: {
-                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                   size: 12
                 }
               }
@@ -657,11 +1045,11 @@
             tooltip: {
               backgroundColor: 'rgba(0, 0, 0, 0.7)',
               titleFont: {
-                family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                 size: 14
               },
               bodyFont: {
-                family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                 size: 13
               },
               padding: 12,
@@ -677,14 +1065,14 @@
                 display: true,
                 text: getTranslation('chart.xAxis'),
                 font: {
-                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                   weight: '500',
                   size: 13
                 }
               },
               ticks: {
                 font: {
-                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                   size: 12
                 }
               }
@@ -698,14 +1086,14 @@
                 display: true,
                 text: getTranslation('chart.yAxis'),
                 font: {
-                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                   weight: '500',
                   size: 13
                 }
               },
               ticks: {
                 font: {
-                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  family: currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif',
                   size: 12
                 }
               }
@@ -720,68 +1108,124 @@
       return growthChart;
     }
     
-    // Update chart to reflect current language
-    function updateGrowthChart() {
-      if (growthChart) {
-        // Update chart labels and titles
-        growthChart.data.datasets[0].label = getTranslation('chart.dataLabel');
-        growthChart.options.scales.x.title.text = getTranslation('chart.xAxis');
-        growthChart.options.scales.y.title.text = getTranslation('chart.yAxis');
-        
-        // Update font family based on language
-        const fontFamily = currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif";
-        growthChart.options.plugins.legend.labels.font.family = fontFamily;
-        growthChart.options.plugins.tooltip.titleFont.family = fontFamily;
-        growthChart.options.plugins.tooltip.bodyFont.family = fontFamily;
-        growthChart.options.scales.x.title.font.family = fontFamily;
-        growthChart.options.scales.x.ticks.font.family = fontFamily;
-        growthChart.options.scales.y.title.font.family = fontFamily;
-        growthChart.options.scales.y.ticks.font.family = fontFamily;
-        
-        growthChart.update();
-      }
-    }
-
     /**
-     * Calculate and update plant statistics
+     * Update growth chart with prediction history
      */
-    function updateStatistics(values, labels) {
-      if (values.length > 0) {
-        // Current height
-        const currentHeight = values[values.length - 1];
-        document.getElementById('currentHeight').textContent = currentHeight.toFixed(1);
+    function updateGrowthChart() {
+      if (!growthChart) {
+        growthChart = initializeChart();
+      }
+      
+      // Update chart labels and titles based on language
+      growthChart.data.datasets[0].label = getTranslation('chart.dataLabel');
+      growthChart.options.scales.x.title.text = getTranslation('chart.xAxis');
+      growthChart.options.scales.y.title.text = getTranslation('chart.yAxis');
+      
+      // Update font family based on language
+      const fontFamily = currentLang === 'hi' ? 'Hind, sans-serif' : 'Poppins, sans-serif';
+      growthChart.options.plugins.legend.labels.font.family = fontFamily;
+      growthChart.options.plugins.tooltip.titleFont.family = fontFamily;
+      growthChart.options.plugins.tooltip.bodyFont.family = fontFamily;
+      growthChart.options.scales.x.title.font.family = fontFamily;
+      growthChart.options.scales.x.ticks.font.family = fontFamily;
+      growthChart.options.scales.y.title.font.family = fontFamily;
+      growthChart.options.scales.y.ticks.font.family = fontFamily;
+      
+      if (predictionHistory.length > 0) {
+        // Sort history by day
+        const sortedHistory = [...predictionHistory].sort((a, b) => a.days - b.days);
         
-        // Height trend
-        if (values.length > 1) {
-          const previousHeight = values[values.length - 2];
-          const change = currentHeight - previousHeight;
-          const trendElement = document.getElementById('heightTrend');
+        // Generate chart data from history
+        const labels = sortedHistory.map(p => `Day ${p.days}`);
+        const values = sortedHistory.map(p => p.height);
+        
+        // Generate future projections if we have enough data
+        if (sortedHistory.length >= 2) {
+          const lastDays = sortedHistory[sortedHistory.length - 1].days;
+          const lastHeight = sortedHistory[sortedHistory.length - 1].height;
           
-          if (change > 0) {
-            trendElement.innerHTML = `<i class="bi bi-arrow-up me-1 trend-up"></i><span class="trend-up">+${change.toFixed(1)} cm</span>`;
-          } else if (change < 0) {
-            trendElement.innerHTML = `<i class="bi bi-arrow-down me-1 trend-down"></i><span class="trend-down">${change.toFixed(1)} cm</span>`;
-          } else {
-            trendElement.innerHTML = `<i class="bi bi-dash me-1"></i><span>${getTranslation('trend.noChange')}</span>`;
+          // Calculate average growth rate
+          const growthRates = [];
+          for (let i = 1; i < sortedHistory.length; i++) {
+            const daysDiff = sortedHistory[i].days - sortedHistory[i-1].days;
+            if (daysDiff > 0) {
+              const rate = (sortedHistory[i].height - sortedHistory[i-1].height) / daysDiff;
+              growthRates.push(rate);
+            }
+          }
+          
+          const avgGrowthRate = growthRates.reduce((sum, val) => sum + val, 0) / growthRates.length;
+          
+          // Add future projections (7 days)
+          for (let i = 1; i <= 7; i++) {
+            const futureDay = lastDays + i;
+            const futureHeight = lastHeight + (avgGrowthRate * i);
+            
+            labels.push(`Day ${futureDay}`);
+            values.push(futureHeight);
           }
         }
         
-        // Growth rate
-        if (values.length > 1) {
-          const growthRates = [];
-          for (let i = 1; i < values.length; i++) {
-            growthRates.push(values[i] - values[i-1]);
-          }
-          const avgGrowthRate = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
-          document.getElementById('growthRate').textContent = avgGrowthRate.toFixed(2);
-        }
+        // Update chart
+        growthChart.data.labels = labels;
+        growthChart.data.datasets[0].data = values;
+      }
+      
+      growthChart.update();
+    }
+    
+    /**
+     * Update the health status display
+     */
+    function updateHealthStatus(status, message) {
+      const healthStatusDiv = document.getElementById('healthStatus');
+      
+      if (status.toLowerCase() === "sick") {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card sick">
+            <div class="health-icon sick">
+              <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.sick')}</div>
+              <div class="health-description">${getTranslation('health.desc.sick')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger ms-auto">${getTranslation('health.button.details')}</button>
+          </div>
+        `;
+      } else if (status.toLowerCase() === "healthy") {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card healthy">
+            <div class="health-icon healthy">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.healthy')}</div>
+              <div class="health-description">${getTranslation('health.desc.healthy')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-success ms-auto">${getTranslation('health.button.details')}</button>
+          </div>
+        `;
+      } else {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card unknown">
+            <div class="health-icon unknown">
+              <i class="bi bi-question-circle"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.unknown')}</div>
+              <div class="health-description">${getTranslation('health.desc.unknown')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary ms-auto">${getTranslation('health.button.check')}</button>
+          </div>
+        `;
       }
     }
     
     /**
      * Generate recommendations based on plant status and growth
      */
-    function updateRecommendations(status, disease, values) {
+    function updateRecommendations(status, disease, predictions) {
       const container = document.getElementById('recommendationsContainer');
       let recommendations = '<ul class="list-group list-group-flush">';
       
@@ -814,7 +1258,7 @@
           <li class="list-group-item d-flex align-items-center">
             <i class="bi bi-exclamation-triangle me-3 text-danger fs-4"></i>
             <div>
-              <h6 class="mb-1">${getTranslation('recommendations.treatment')} ${disease}</h6>
+              <h6 class="mb-1">${getTranslation('recommendations.treatment')}</h6>
               <p class="mb-0 text-muted small">${getTranslation('recommendations.treatmentDesc')}</p>
             </div>
           </li>
@@ -850,105 +1294,106 @@
     }
     
     /**
-     * Update the health status display.
+     * Show notification
      */
-    function updateHealthStatus(status, disease) {
-      const healthStatusDiv = document.getElementById('healthStatus');
+    function showNotification(message, type = 'info') {
+      // Create notification element if it doesn't exist
+      let notificationArea = document.getElementById('notificationArea');
       
-      if (status.toLowerCase() === "sick") {
-        healthStatusDiv.innerHTML = `
-          <div class="health-card sick">
-            <div class="health-icon sick">
-              <i class="bi bi-heart-pulse"></i>
-            </div>
-            <div class="health-details">
-              <div class="health-status">${getTranslation('health.status.sick')}</div>
-              <div class="health-description">${getTranslation('health.desc.sick')} ${disease}</div>
-            </div>
-            <button class="btn btn-sm btn-outline-danger ms-auto">${getTranslation('health.button.details')}</button>
-          </div>
-        `;
-      } else if (status.toLowerCase() === "healthy") {
-        healthStatusDiv.innerHTML = `
-          <div class="health-card healthy">
-            <div class="health-icon healthy">
-              <i class="bi bi-check-circle"></i>
-            </div>
-            <div class="health-details">
-              <div class="health-status">${getTranslation('health.status.healthy')}</div>
-              <div class="health-description">${getTranslation('health.desc.healthy')}</div>
-            </div>
-            <button class="btn btn-sm btn-outline-success ms-auto">${getTranslation('health.button.details')}</button>
-          </div>
-        `;
-      } else {
-        healthStatusDiv.innerHTML = `
-          <div class="health-card unknown">
-            <div class="health-icon unknown">
-              <i class="bi bi-question-circle"></i>
-            </div>
-            <div class="health-details">
-              <div class="health-status">${getTranslation('health.status.unknown')}</div>
-              <div class="health-description">${getTranslation('health.desc.unknown')}</div>
-            </div>
-            <button class="btn btn-sm btn-outline-secondary ms-auto">${getTranslation('health.button.check')}</button>
-          </div>
-        `;
-      }
+      // Create notification
+      const notification = document.createElement('div');
+      notification.className = `alert alert-${type} alert-dismissible fade show`;
+      notification.role = "alert";
+      notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      
+      // Add to notification area
+      notificationArea.appendChild(notification);
+      
+      // Remove after 5 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 200);
+      }, 5000);
     }
-
+    
     /**
-     * Update the dashboard with the latest data.
+     * Auto-fill sensor values with realistic data
      */
-    async function updateDashboard(chart) {
-      showLoader();
+    function autoFillSensorValues() {
+      // Temperature between 20-30°C
+      document.getElementById('Temperature(C)').value = (Math.random() * 10 + 20).toFixed(1);
       
-      try {
-        const predictions = await fetchPredictions();
-        
-        // Update the chart data
-        chart.data.labels = predictions.labels;
-        chart.data.datasets[0].data = predictions.values;
-        chart.update();
-        
-        // Update statistics cards
-        updateStatistics(predictions.values, predictions.labels);
-        
-        // Update the health status display
-        updateHealthStatus(predictions.status, predictions.disease);
-        
-        // Update recommendations
-        updateRecommendations(predictions.status, predictions.disease, predictions.values);
-        
-        hideLoader();
-      } catch (error) {
-        console.error('Error updating dashboard:', error);
-        hideLoader();
-        
-        // Show error message
-        const chartContainer = document.getElementById('chartContainer');
-        chartContainer.innerHTML = `
-          <div class="alert alert-danger text-center">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>
-            ${getTranslation('error.loading')}
-          </div>
-        `;
+      // Humidity between 50-80%
+      document.getElementById('Humidity(%)').value = (Math.random() * 30 + 50).toFixed(1);
+      
+      // Soil moisture between 30-70%
+      document.getElementById('SoilMoisture(%)').value = (Math.random() * 40 + 30).toFixed(1);
+      
+      // Light intensity between 4000-12000 lux
+      document.getElementById('LightIntensity(lux)').value = Math.floor(Math.random() * 8000 + 4000);
+      
+      // Soil pH between 5.5-7.5
+      document.getElementById('SoilpH').value = (Math.random() * 2 + 5.5).toFixed(1);
+      
+      // Keep the current days value or increment by a random amount between 1-7
+      const currentDays = parseInt(document.getElementById('DaysSincePlanting').value);
+      if (currentDays < 10) { 
+        // For new plants, just keep the current value
+        document.getElementById('DaysSincePlanting').value = currentDays;
+      } else {
+        // For established plants, increment to simulate progress
+        document.getElementById('DaysSincePlanting').value = currentDays + Math.floor(Math.random() * 7) + 1;
       }
     }
     
-    // Initialize the chart and update the dashboard immediately.
-    const chart = initializeChart();
-    updateDashboard(chart);
-    
-    // Add event listener for refresh button
-    document.getElementById('refreshButton').addEventListener('click', () => {
-      updateDashboard(chart);
+    // Initialize the dashboard when the document is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Initializing Agrisense Dashboard...");
+      
+      // Initialize the chart
+      initializeChart();
+      
+      // Connect to WebSocket
+      initWebSocket();
+      
+      // Add form submission handler
+      document.getElementById('sensorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendSensorData();
+      });
+      
+      // Add auto-fill button handler
+      document.getElementById('autoFillBtn').addEventListener('click', function() {
+        autoFillSensorValues();
+      });
+      
+      // Add refresh button handler
+      document.getElementById('refreshButton').addEventListener('click', function() {
+        if (lastPrediction) {
+          // Update the chart with existing data
+          updateGrowthChart();
+          
+          // If we have prediction history, update stats
+          if (predictionHistory.length > 0) {
+            updateUIWithPrediction(lastPrediction);
+          }
+        } else {
+          // No predictions yet, try to send sensor data
+          sendSensorData();
+        }
+      });
+      
+      // Set up health status button event listeners
+      document.getElementById('healthStatus').addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') {
+          // Show appropriate modal or popup based on button clicked
+          showNotification(getTranslation('health.status.healthy'), 'info');
+        }
+      });
     });
-
-    // Refresh the dashboard every 30 seconds.
-    setInterval(() => {
-      updateDashboard(chart);
-    }, 30000);
   </script>
 </body>
 </html>
