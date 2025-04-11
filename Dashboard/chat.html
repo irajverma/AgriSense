@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agrisense Chat</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      background-color: #f5f5f5;
+      padding-bottom: 2rem;
+    }
+    .bg-agrisense {
+      background-color: #2e7d32;
+    }
+    .btn-agrisense {
+      background-color: #2e7d32;
+      border-color: #2e7d32;
+      color: white;
+    }
+    .btn-agrisense:hover {
+      background-color: #005005;
+      border-color: #005005;
+      color: white;
+    }
+    .chat-container {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      border-radius: 0.5rem;
+    }
+    .chat-window {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      background: #fafafa;
+      border-radius: 0.25rem;
+    }
+    .message {
+      margin: 10px 0;
+    }
+    .user {
+      color: blue;
+    }
+    .bot {
+      color: darkgreen;
+    }
+    .sensor-status {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation (similar to your index.html) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-agrisense">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-flower1 me-2"></i>Agrisense Dashboard
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="chat.html">
+              <i class="bi bi-chat-dots me-1"></i>Chat
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="predictions.html">
+              <i class="bi bi-graph-up-arrow me-1"></i>Predictions
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Chatbot Interface -->
+  <div class="container chat-container">
+    <h2 class="mb-3">Agrisense Chatbot</h2>
+    <div class="sensor-status">
+      Status: <span id="connectionStatusText">Disconnected</span>
+    </div>
+    <div id="chatWindow" class="chat-window"></div>
+    <div class="input-group mt-3">
+      <input type="text" id="userInput" class="form-control" placeholder="Ask your question here...">
+      <button id="sendButton" class="btn btn-agrisense">Send</button>
+    </div>
+    <div class="mt-3">
+      <p><strong>Try asking:</strong></p>
+      <ul>
+        <li>"Hi" or "Hello"</li>
+        <li>"What is the current sensor data?"</li>
+        <li>"Explain these sensor readings."</li>
+        <li>"What crops can I plant in this season?"</li>
+        <li>"Is my crop affected from a disease?"</li>
+        <li>"What is the growth rate of my crop?"</li>
+        <li>"Bye"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    /***** Global Sensor Data & WebSocket Integration *****/
+    let sensorData = {
+      temperature: "--",
+      humidity: "--",
+      soilMoisture: "--"
+    };
+
+    // Use the same WebSocket parameters as index.html
+    const wsHost = "192.168.76.140";
+    const wsPort = "5000";
+    let ws = null;
+    let reconnectTimer = null;
+    const reconnectInterval = 5000; // 5 seconds
+
+    function updateConnectionStatus(status) {
+      document.getElementById('connectionStatusText').textContent = status;
+    }
+
+    // Connect to sensor data WebSocket
+    function connectWebSocket() {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (ws) ws.close();
+      updateConnectionStatus("Connecting...");
+      try {
+        ws = new WebSocket(`ws://${wsHost}:${wsPort}`);
+        ws.onopen = function() {
+          updateConnectionStatus("Connected");
+          console.log("WebSocket connected.");
+        };
+        ws.onmessage = function(event) {
+          try {
+            const data = JSON.parse(event.data);
+            sensorData.temperature = data.temperature;
+            sensorData.humidity = data.humidity;
+            sensorData.soilMoisture = (parseFloat(data.soilMoisture) / 100).toFixed(2);
+          } catch (error) {
+            console.error("Error processing WebSocket message:", error);
+          }
+        };
+        ws.onerror = function() {
+          updateConnectionStatus("Error");
+          console.error("WebSocket error occurred.");
+        };
+        ws.onclose = function() {
+          updateConnectionStatus("Disconnected");
+          console.log("WebSocket closed. Reconnecting in", reconnectInterval, "ms.");
+          reconnectTimer = setTimeout(connectWebSocket, reconnectInterval);
+        };
+      } catch (error) {
+        console.error("Error creating WebSocket connection:", error);
+        updateConnectionStatus("Failed");
+        reconnectTimer = setTimeout(connectWebSocket, reconnectInterval);
+      }
+    }
+
+    /***** Chatbot Fulfillment Functions *****/
+    function getRealTimeSensorData() {
+      return `Right now, the temperature is ${sensorData.temperature} °C, the humidity is ${sensorData.humidity}%, and the soil moisture is ${sensorData.soilMoisture}%.`;
+    }
+
+    function explainSensorData() {
+      return "Temperature shows how warm your field is, humidity tells you how much moisture is in the air, and soil moisture indicates the water available in the soil for plants.";
+    }
+
+    function getCropRecommendations() {
+      const currentTemp = parseFloat(sensorData.temperature);
+      if (isNaN(currentTemp)) {
+        return "Sensor data is not available right now. Please try again later.";
+      } else if (currentTemp < 23) {
+        return "It’s cool now. Consider planting leafy greens like spinach or lettuce.";
+      } else if (currentTemp >= 23 && currentTemp <= 28) {
+        return "The conditions are perfect. Tomatoes or peppers would be a great choice.";
+      } else {
+        return "It’s warm now. Crops like eggplant or okra might do well.";
+      }
+    }
+
+    function getDiseaseDetectionResponse() {
+      // Placeholder response for crop disease detection ML model
+      return "Crop disease detection is not available yet. Our ML model will update this feature soon.";
+    }
+
+    function getGrowthRateResponse() {
+      // Placeholder response for crop growth rate analysis ML model
+      return "Crop growth rate information is coming soon. Please check back later for updates.";
+    }
+
+    function getGreetingResponse() {
+      return "Hello! How can I help you today?";
+    }
+
+    function getFarewellResponse() {
+      return "Goodbye! Have a great day!";
+    }
+
+    /***** Chatbot Interaction Handler *****/
+    document.getElementById('sendButton').addEventListener('click', function() {
+      const chatWindow = document.getElementById('chatWindow');
+      const userInput = document.getElementById('userInput');
+      const userQuery = userInput.value.trim();
+      if (!userQuery) return;
+
+      // Append the user's message to the chat window
+      chatWindow.innerHTML += `<p class="message user"><strong>You:</strong> ${userQuery}</p>`;
+      let botResponse = "";
+      const queryLower = userQuery.toLowerCase();
+
+      // Check for simple greetings
+      if (queryLower.includes("hi") || queryLower.includes("hello") || queryLower.includes("hey")) {
+        botResponse = getGreetingResponse();
+      }
+      // Check for farewell terms
+      else if (queryLower.includes("bye") || queryLower.includes("goodbye") || queryLower.includes("see you")) {
+        botResponse = getFarewellResponse();
+      }
+      // Intent: GetRealTimeSensorData (if the query includes sensor, data, or reading)
+      else if (queryLower.includes("sensor") || queryLower.includes("data") || queryLower.includes("reading")) {
+        botResponse = getRealTimeSensorData();
+      }
+      // Intent: ExplainSensorData (if query asks for explanation)
+      else if (queryLower.includes("explain") || queryLower.includes("what does") || queryLower.includes("mean") || queryLower.includes("interpret")) {
+        botResponse = explainSensorData();
+      }
+      // Intent: CropRecommendations (if query asks about planting or crops)
+      else if (queryLower.includes("crop") || queryLower.includes("plant") || queryLower.includes("grow") || queryLower.includes("season")) {
+        botResponse = getCropRecommendations();
+      }
+      // Intent: Disease Detection (if query asks about disease)
+      else if (queryLower.includes("disease") || queryLower.includes("sick") || queryLower.includes("affected")) {
+        botResponse = getDiseaseDetectionResponse();
+      }
+      // Intent: Growth Rate (if query asks about growth or rate)
+      else if (queryLower.includes("growth") || queryLower.includes("rate")) {
+        botResponse = getGrowthRateResponse();
+      }
+      // Fallback response for unrecognized queries
+      else {
+        botResponse = "I'm sorry, I didn't understand that. Please ask about sensor data, crop recommendations, or say hello.";
+      }
+
+      // Append the bot's response and clear the input field
+      chatWindow.innerHTML += `<p class="message bot"><strong>Bot:</strong> ${botResponse}</p>`;
+      userInput.value = "";
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    });
+
+    // Initialize WebSocket connection when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      connectWebSocket();
+    });
+  </script>
+</body>
+</html>

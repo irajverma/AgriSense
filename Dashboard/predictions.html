@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Predictions - Agrisense Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    /* Global Styles */
+    body {
+      background-color: #f5f5f5;
+      padding-bottom: 2rem;
+    }
+    .bg-agrisense {
+      background-color: #2e7d32;
+    }
+    .btn-agrisense {
+      background-color: #2e7d32;
+      border-color: #2e7d32;
+      color: white;
+    }
+    .btn-agrisense:hover {
+      background-color: #005005;
+      border-color: #005005;
+      color: white;
+    }
+    /* Container styles for predictions page */
+    .chart-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: white;
+      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      border-radius: 0.5rem;
+    }
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+    }
+    /* Health status alert styling */
+    .health-alert {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar (same as provided) -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-agrisense">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <i class="bi bi-flower1 me-2"></i>Agrisense Dashboard
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="chat.html">
+              <i class="bi bi-chat-dots me-1"></i>Chat
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="predictions.html">
+              <i class="bi bi-graph-up-arrow me-1"></i>Predictions
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Predictions Page Content -->
+  <div class="chart-container">
+    <h2 class="mb-4">Plant Growth Predictions</h2>
+    <!-- This div will show the plant health status -->
+    <div id="healthStatus" class="health-alert"></div>
+    <canvas id="growthChart"></canvas>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <!-- Load Chart.js library from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    /**
+     * Fetch real-time prediction data from the backend.
+     * Expected JSON format:
+     * {
+     *   "labels": ["Day 1", "Day 2", "Day 3", ...],
+     *   "values": [5, 12, 20, ...],
+     *   "status": "healthy" // or "sick"
+     *   "disease": "Disease Name" // present only if status is "sick"
+     * }
+     */
+    async function fetchPredictions() {
+      try {
+        const response = await fetch('/api/predictions');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching predictions:', error);
+        return { labels: [], values: [], status: "unknown", disease: "" };
+      }
+    }
+
+    /**
+     * Initialize the Chart.js chart.
+     */
+    function initializeChart() {
+      const ctx = document.getElementById('growthChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],  // To be updated dynamically
+          datasets: [{
+            label: 'Plant Height (cm)',
+            data: [],   // To be updated dynamically
+            fill: false,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Time (Days)'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Plant Height (cm)'
+              }
+            }
+          }
+        }
+      });
+      return chart;
+    }
+
+    /**
+     * Update both the chart and the health status display.
+     */
+    async function updateDashboard(chart) {
+      const predictions = await fetchPredictions();
+      
+      // Update the chart data
+      chart.data.labels = predictions.labels;
+      chart.data.datasets[0].data = predictions.values;
+      chart.update();
+
+      // Update the health status display
+      const healthStatusDiv = document.getElementById('healthStatus');
+      if (predictions.status.toLowerCase() === "sick") {
+        // If the plant is sick, display the disease name
+        healthStatusDiv.innerHTML = `<div class="alert alert-danger">Plant Status: Sick – ${predictions.disease}</div>`;
+      } else if (predictions.status.toLowerCase() === "healthy") {
+        healthStatusDiv.innerHTML = `<div class="alert alert-success">Plant Status: Healthy</div>`;
+      } else {
+        healthStatusDiv.innerHTML = `<div class="alert alert-secondary">Plant Status: Unknown</div>`;
+      }
+    }
+
+    // Initialize the chart and update the dashboard immediately.
+    const growthChart = initializeChart();
+    updateDashboard(growthChart);
+
+    // Refresh the dashboard every 30 seconds.
+    setInterval(() => {
+      updateDashboard(growthChart);
+    }, 30000);
+  </script>
+</body>
+</html>
