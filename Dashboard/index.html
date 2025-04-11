@@ -8,105 +8,300 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts - For Hindi Support -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Hind:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --agrisense-green: #2e7d32;
       --agrisense-light: #60ad5e;
       --agrisense-dark: #005005;
+      --agrisense-accent: #81c784;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --transition-time: 0.3s;
     }
     
     body {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
+      font-family: 'Poppins', 'Hind', 'Segoe UI', system-ui, -apple-system, sans-serif;
       padding-bottom: 2rem;
+      color: #404040;
+    }
+    
+    body.hindi {
+      font-family: 'Hind', 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    
+    .language-switcher {
+      display: flex;
+      align-items: center;
+      margin-left: 15px;
+    }
+    
+    .language-btn {
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    
+    .language-btn:hover, 
+    .language-btn.active {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .navbar {
+      padding: 0.8rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .navbar-brand i {
+      font-size: 1.25rem;
+    }
+    
+    .page-header {
+      padding: 2rem 0 1.5rem;
+      text-align: center;
+      position: relative;
+    }
+    
+    .page-header h1 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #2e2e2e;
+    }
+    
+    .page-header .lead {
+      font-weight: 400;
+      color: #6c757d;
+      max-width: 600px;
+      margin: 0 auto 1rem;
     }
     
     .card {
-      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border-radius: 12px;
       border: none;
+      box-shadow: var(--card-shadow);
       margin-bottom: 1.5rem;
-      transition: transform 0.2s;
+      transition: transform var(--transition-time), box-shadow var(--transition-time);
+      overflow: hidden;
     }
     
-    .welcome-card {
-      border-radius: 1rem;
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .sensor-card {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      position: relative;
       overflow: hidden;
-      border: none;
-      height: 100%;
+    }
+    
+    .sensor-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--agrisense-green);
+    }
+    
+    .sensor-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--agrisense-light), var(--agrisense-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    
+    .sensor-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: #333;
     }
     
     .sensor-value {
-      font-size: 2.5rem;
+      font-size: 2.75rem;
       font-weight: 700;
-      color: var(--agrisense-green);
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--agrisense-dark), var(--agrisense-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: all var(--transition-time);
+      margin-bottom: 0.25rem;
     }
     
     .sensor-unit {
       font-size: 1rem;
       color: #6c757d;
-    }
-    
-    .sensor-card {
-      text-align: center;
-      padding: 1.5rem;
+      font-weight: 500;
     }
     
     /* Connection status */
+    .connection-container {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1rem;
+      transition: all var(--transition-time);
+    }
+    
     .status-indicator {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       display: inline-block;
-      margin-right: 5px;
+      margin-right: 8px;
+      position: relative;
     }
     
     .status-online {
-      background-color: #198754;
+      background-color: #2ecc71;
+      box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+      animation: pulse 2s infinite;
     }
     
     .status-offline {
-      background-color: #dc3545;
+      background-color: #e74c3c;
+      box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.2);
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+      }
+    }
+    
+    #connectionStatusText {
+      font-weight: 500;
+      font-size: 0.9rem;
     }
     
     .last-update {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #6c757d;
-      margin-top: 0.5rem;
+      font-weight: 400;
+    }
+    
+    /* Chart cards */
+    .chart-card {
+      position: relative;
+    }
+    
+    .card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      background-color: white;
+    }
+    
+    .card-header h5 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      color: #333;
+    }
+    
+    .chart-badge {
+      font-weight: 500;
+      padding: 0.4rem 0.7rem;
+      border-radius: 20px;
+    }
+    
+    .chart-container {
+      height: 250px; 
+      width: 100%;
+      padding: 1rem 0.5rem;
     }
     
     /* Custom color scheme */
     .bg-agrisense {
-      background-color: var(--agrisense-green);
+      background: linear-gradient(135deg, var(--agrisense-green), var(--agrisense-dark));
+    }
+    
+    .bg-temperature {
+      background: linear-gradient(135deg, #ff7043, #f4511e);
+    }
+    
+    .bg-humidity {
+      background: linear-gradient(135deg, #42a5f5, #1976d2);
+    }
+    
+    .bg-moisture {
+      background: linear-gradient(135deg, #7e57c2, #512da8);
     }
     
     .btn-agrisense {
       background-color: var(--agrisense-green);
       border-color: var(--agrisense-green);
       color: white;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
     }
     
     .btn-agrisense:hover {
       background-color: var(--agrisense-dark);
       border-color: var(--agrisense-dark);
-      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     
-    .btn-outline-agrisense {
-      color: var(--agrisense-green);
-      border-color: var(--agrisense-green);
+    /* Footer */
+    footer {
+      margin-top: 3rem;
+      background-color: #263238;
     }
     
-    .btn-outline-agrisense:hover {
-      background-color: var(--agrisense-green);
-      color: white;
+    footer h5 {
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
     
-    .text-agrisense {
-      color: var(--agrisense-green);
+    footer .text-muted {
+      color: rgba(255, 255, 255, 0.6) !important;
     }
     
-    .chart-container {
-      height: 250px; 
-      width: 100%;
+    /* Responsive adjustments */
+    @media (max-width: 767.98px) {
+      .sensor-value {
+        font-size: 2.25rem;
+      }
+      
+      .sensor-card {
+        padding: 1.5rem 1rem;
+      }
+      
+      .page-header {
+        padding: 1.5rem 0 1rem;
+      }
+      
+      .page-header h1 {
+        font-size: 1.75rem;
+      }
     }
   </style>
 </head>
@@ -116,7 +311,7 @@
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
         <i class="bi bi-flower1 me-2"></i>
-        Agrisense Dashboard
+        <span data-lang-key="brand">Agrisense Dashboard</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -124,17 +319,28 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+            <a class="nav-link active" aria-current="page" href="#">
+              <i class="bi bi-grid me-1"></i> <span data-lang-key="dashboard">Dashboard</span>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="chat.html">
-              <i class="bi bi-chat-dots me-1"></i>Chat
+              <i class="bi bi-chat-dots me-1"></i> <span data-lang-key="chat">Chat</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="predictions.html">
-              <i class="bi bi-graph-up-arrow me-1"></i>Predictions
+              <i class="bi bi-graph-up-arrow me-1"></i> <span data-lang-key="predictions">Predictions</span>
             </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-globe me-1"></i> <span data-lang-key="language">Language</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item language-option" href="#" data-lang="en">English</a></li>
+              <li><a class="dropdown-item language-option" href="#" data-lang="hi">हिन्दी (Hindi)</a></li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -143,25 +349,23 @@
 
   <!-- Main Content -->
   <div class="container mt-4">
-    <div class="row">
-      <div class="col-md-8 mx-auto text-center mb-4">
-        <h1 class="display-5 fw-bold">Agrisense Monitoring</h1>
-        <p class="lead">Real-time agricultural environment data</p>
-        <div class="d-flex justify-content-center align-items-center">
-          <div class="status-indicator status-offline" id="connectionStatus"></div>
-          <span id="connectionStatusText">Disconnected</span>
-        </div>
-        <div class="last-update" id="lastUpdateTime">Last update: Never</div>
+    <header class="page-header">
+      <h1 class="display-5 fw-bold" data-lang-key="heading">Agrisense Monitoring</h1>
+      <p class="lead" data-lang-key="subheading">Real-time agricultural environment data</p>
+      <div class="connection-container">
+        <div class="status-indicator status-offline" id="connectionStatus"></div>
+        <span id="connectionStatusText" data-lang-key="disconnected">Disconnected</span>
       </div>
-    </div>
+      <div class="last-update" id="lastUpdateTime"><span data-lang-key="lastUpdate">Last update</span>: <span data-lang-key="never">Never</span></div>
+    </header>
     
     <!-- Sensor Cards -->
     <div class="row g-4">
       <div class="col-md-4">
         <div class="card h-100">
           <div class="card-body sensor-card">
-            <i class="bi bi-thermometer-half text-agrisense fs-1 mb-3"></i>
-            <h3>Temperature</h3>
+            <i class="bi bi-thermometer-half sensor-icon"></i>
+            <h3 data-lang-key="temperature">Temperature</h3>
             <div class="sensor-value" id="temperature">--</div>
             <div class="sensor-unit">°C</div>
           </div>
@@ -170,8 +374,8 @@
       <div class="col-md-4">
         <div class="card h-100">
           <div class="card-body sensor-card">
-            <i class="bi bi-droplet-half text-agrisense fs-1 mb-3"></i>
-            <h3>Humidity</h3>
+            <i class="bi bi-droplet-half sensor-icon"></i>
+            <h3 data-lang-key="humidity">Humidity</h3>
             <div class="sensor-value" id="humidity">--</div>
             <div class="sensor-unit">%</div>
           </div>
@@ -180,8 +384,8 @@
       <div class="col-md-4">
         <div class="card h-100">
           <div class="card-body sensor-card">
-            <i class="bi bi-moisture text-agrisense fs-1 mb-3"></i>
-            <h3>Soil Moisture</h3>
+            <i class="bi bi-moisture sensor-icon"></i>
+            <h3 data-lang-key="soilMoisture">Soil Moisture</h3>
             <div class="sensor-value" id="soilMoisture">--</div>
             <div class="sensor-unit">%</div>
           </div>
@@ -192,10 +396,10 @@
     <!-- Sensor History Graphs -->
     <div class="row mt-4">
       <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Temperature History</h5>
-            <span class="badge bg-agrisense" id="temperatureStats">--</span>
+        <div class="card h-100 chart-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" data-lang-key="temperatureHistory">Temperature History</h5>
+            <span class="chart-badge bg-temperature text-white" id="temperatureStats">--</span>
           </div>
           <div class="card-body">
             <div class="chart-container">
@@ -206,10 +410,10 @@
       </div>
       
       <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Humidity History</h5>
-            <span class="badge bg-primary" id="humidityStats">--</span>
+        <div class="card h-100 chart-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" data-lang-key="humidityHistory">Humidity History</h5>
+            <span class="chart-badge bg-humidity text-white" id="humidityStats">--</span>
           </div>
           <div class="card-body">
             <div class="chart-container">
@@ -220,10 +424,10 @@
       </div>
       
       <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Soil Moisture History</h5>
-            <span class="badge bg-purple" id="soilMoistureStats">--</span>
+        <div class="card h-100 chart-card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" data-lang-key="soilMoistureHistory">Soil Moisture History</h5>
+            <span class="chart-badge bg-moisture text-white" id="soilMoistureStats">--</span>
           </div>
           <div class="card-body">
             <div class="chart-container">
@@ -243,15 +447,15 @@
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white py-4 mt-5">
+  <footer class="py-4 mt-5">
     <div class="container">
       <div class="row">
         <div class="col-md-6">
-          <h5>Agrisense Dashboard</h5>
-          <p class="text-muted">Real-time agricultural monitoring system</p>
+          <h5 data-lang-key="brand">Agrisense Dashboard</h5>
+          <p class="text-muted" data-lang-key="footerDesc">Real-time agricultural monitoring system</p>
         </div>
         <div class="col-md-6 text-md-end">
-          <p class="mb-0">Version 1.0.0</p>
+          <p class="mb-0 text-muted" data-lang-key="version">Version 1.0.0</p>
         </div>
       </div>
     </div>
@@ -261,6 +465,62 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  
+  <script>
+    // Language translations
+    const translations = {
+      en: {
+        brand: "Agrisense Dashboard",
+        dashboard: "Dashboard",
+        chat: "Chat",
+        predictions: "Predictions",
+        language: "Language",
+        heading: "Agrisense Monitoring",
+        subheading: "Real-time agricultural environment data",
+        connected: "Connected",
+        connecting: "Connecting...",
+        disconnected: "Disconnected",
+        error: "Error",
+        failed: "Failed",
+        lastUpdate: "Last update",
+        never: "Never",
+        temperature: "Temperature",
+        humidity: "Humidity",
+        soilMoisture: "Soil Moisture",
+        temperatureHistory: "Temperature History",
+        humidityHistory: "Humidity History",
+        soilMoistureHistory: "Soil Moisture History",
+        avg: "Avg",
+        footerDesc: "Real-time agricultural monitoring system",
+        version: "Version 1.0.0"
+      },
+      hi: {
+        brand: "एग्रीसेंस डैशबोर्ड",
+        dashboard: "डैशबोर्ड",
+        chat: "चैट",
+        predictions: "भविष्यवाणियाँ",
+        language: "भाषा",
+        heading: "एग्रीसेंस निगरानी",
+        subheading: "वास्तविक समय कृषि पर्यावरण डेटा",
+        connected: "कनेक्टेड",
+        connecting: "कनेक्ट हो रहा है...",
+        disconnected: "डिस्कनेक्टेड",
+        error: "त्रुटि",
+        failed: "विफल",
+        lastUpdate: "अंतिम अपडेट",
+        never: "कभी नहीं",
+        temperature: "तापमान",
+        humidity: "आर्द्रता",
+        soilMoisture: "मिट्टी की नमी",
+        temperatureHistory: "तापमान इतिहास",
+        humidityHistory: "आर्द्रता इतिहास",
+        soilMoistureHistory: "मिट्टी की नमी इतिहास",
+        avg: "औसत",
+        footerDesc: "वास्तविक समय कृषि निगरानी प्रणाली",
+        version: "संस्करण 1.0.0"
+      }
+    };
+  </script>
   
   <script>
     // Global variables
@@ -327,20 +587,24 @@
     
     // Update statistics display
     function updateStats() {
+      // Get current language
+      const currentLang = localStorage.getItem('language') || 'en';
+      const avgText = translations[currentLang].avg;
+      
       // Temperature stats
       const tempStats = calculateStats(historyData.temperature.values);
       document.getElementById('temperatureStats').textContent = 
-        `Avg: ${tempStats.avg}°C`;
+        `${avgText}: ${tempStats.avg}°C`;
       
       // Humidity stats
       const humidityStats = calculateStats(historyData.humidity.values);
       document.getElementById('humidityStats').textContent = 
-        `Avg: ${humidityStats.avg}%`;
+        `${avgText}: ${humidityStats.avg}%`;
       
       // Soil moisture stats
       const soilMoistureStats = calculateStats(historyData.soilMoisture.values);
       document.getElementById('soilMoistureStats').textContent = 
-        `Avg: ${soilMoistureStats.avg}%`;
+        `${avgText}: ${soilMoistureStats.avg}%`;
     }
     
     // Initialize charts
@@ -355,17 +619,27 @@
           },
           tooltip: {
             mode: 'index',
-            intersect: false
+            intersect: false,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            titleColor: '#333',
+            bodyColor: '#333',
+            borderColor: 'rgba(0, 0, 0, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            displayColors: true,
+            boxPadding: 4
           }
         },
         elements: {
           line: {
-            tension: 0.3 // Smooth curves
+            tension: 0.4 // Smoother curves
           },
           point: {
-            radius: 2,
+            radius: 3,
             hitRadius: 10,
-            hoverRadius: 4
+            hoverRadius: 5,
+            hoverBorderWidth: 2
           }
         },
         scales: {
@@ -377,6 +651,11 @@
               autoSkip: true,
               maxTicksLimit: 6,
               maxRotation: 0,
+              padding: 8,
+              color: '#6c757d',
+              font: {
+                size: 10
+              },
               callback: function(value, index, values) {
                 if (!this.chart.data.labels[index]) return '';
                 return formatTime(new Date(this.chart.data.labels[index]));
@@ -386,19 +665,26 @@
           y: {
             beginAtZero: false,
             grid: {
-              drawBorder: false
+              drawBorder: false,
+              color: 'rgba(0, 0, 0, 0.05)'
             },
             ticks: {
-              padding: 5
+              padding: 8,
+              color: '#6c757d',
+              font: {
+                size: 11
+              }
             }
           }
         },
         interaction: {
           mode: 'nearest',
-          intersect: false
+          intersect: false,
+          axis: 'x'
         },
         animation: {
-          duration: 250
+          duration: 300,
+          easing: 'easeOutQuad'
         }
       };
       
@@ -411,10 +697,11 @@
           datasets: [{
             label: 'Temperature (°C)',
             data: [],
-            borderColor: 'rgba(46, 125, 50, 1)',
-            backgroundColor: 'rgba(46, 125, 50, 0.1)',
+            borderColor: '#f4511e',
+            backgroundColor: 'rgba(244, 81, 30, 0.1)',
             borderWidth: 2,
-            fill: true
+            fill: true,
+            pointBackgroundColor: '#f4511e'
           }]
         },
         options: {
@@ -425,7 +712,12 @@
               ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
               title: {
                 display: true,
-                text: '°C'
+                text: '°C',
+                color: '#6c757d',
+                font: {
+                  size: 12,
+                  weight: '500'
+                }
               }
             }
           }
@@ -441,10 +733,11 @@
           datasets: [{
             label: 'Humidity (%)',
             data: [],
-            borderColor: 'rgba(13, 110, 253, 1)',
-            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            borderColor: '#1976d2',
+            backgroundColor: 'rgba(25, 118, 210, 0.1)',
             borderWidth: 2,
-            fill: true
+            fill: true,
+            pointBackgroundColor: '#1976d2'
           }]
         },
         options: {
@@ -455,7 +748,12 @@
               ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
               title: {
                 display: true,
-                text: '%'
+                text: '%',
+                color: '#6c757d',
+                font: {
+                  size: 12,
+                  weight: '500'
+                }
               },
               min: 0,
               max: 100,
@@ -476,10 +774,11 @@
           datasets: [{
             label: 'Soil Moisture (%)',
             data: [],
-            borderColor: 'rgba(123, 31, 162, 1)',
-            backgroundColor: 'rgba(123, 31, 162, 0.1)',
+            borderColor: '#512da8',
+            backgroundColor: 'rgba(81, 45, 168, 0.1)',
             borderWidth: 2,
-            fill: true
+            fill: true,
+            pointBackgroundColor: '#512da8'
           }]
         },
         options: {
@@ -490,7 +789,12 @@
               ...JSON.parse(JSON.stringify(commonOptions.scales.y)),
               title: {
                 display: true,
-                text: '%'
+                text: '%',
+                color: '#6c757d',
+                font: {
+                  size: 12,
+                  weight: '500'
+                }
               },
               min: 0,
               max: 100,
@@ -549,6 +853,62 @@
       updateStats();
     }
     
+    // Create animated number update effect
+    function animateValue(element, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        element.textContent = value.toFixed(1);
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        } else {
+          element.textContent = end.toFixed(1); // Ensure final value is accurate
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+    
+    // Language switching functionality
+    function setLanguage(lang) {
+      // Save language preference
+      localStorage.setItem('language', lang);
+      
+      // Update body class for font family
+      if (lang === 'hi') {
+        document.body.classList.add('hindi');
+      } else {
+        document.body.classList.remove('hindi');
+      }
+      
+      // Update all elements with data-lang-key attribute
+      document.querySelectorAll('[data-lang-key]').forEach(element => {
+        const key = element.getAttribute('data-lang-key');
+        if (translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+      
+      // Update last update time text with current language
+      updateLastUpdateTimeText();
+      
+      // Update statistics display with new language
+      updateStats();
+    }
+    
+    // Update last update time text based on language
+    function updateLastUpdateTimeText() {
+      const currentLang = localStorage.getItem('language') || 'en';
+      const lastUpdateElement = document.getElementById('lastUpdateTime');
+      
+      if (lastUpdateTime) {
+        lastUpdateElement.innerHTML = `${translations[currentLang].lastUpdate}: ${formatTime(lastUpdateTime)}`;
+      } else {
+        lastUpdateElement.innerHTML = `${translations[currentLang].lastUpdate}: ${translations[currentLang].never}`;
+      }
+    }
+    
     // Connect to the WebSocket server
     function connectWebSocket() {
       // Clear any existing reconnect timer
@@ -562,9 +922,12 @@
         ws.close();
       }
       
+      // Get current language for status text
+      const currentLang = localStorage.getItem('language') || 'en';
+      
       // Update status to connecting
       document.getElementById('connectionStatus').className = "status-indicator status-offline";
-      document.getElementById('connectionStatusText').textContent = "Connecting...";
+      document.getElementById('connectionStatusText').textContent = translations[currentLang].connecting;
       
       // Create websocket connection
       try {
@@ -572,8 +935,9 @@
         
         ws.onopen = function() {
           console.log("WebSocket connected");
+          const currentLang = localStorage.getItem('language') || 'en';
           document.getElementById('connectionStatus').className = "status-indicator status-online";
-          document.getElementById('connectionStatusText').textContent = "Connected";
+          document.getElementById('connectionStatusText').textContent = translations[currentLang].connected;
         };
         
         ws.onmessage = function(event) {
@@ -585,14 +949,34 @@
             const rawSoilMoisture = parseFloat(data.soilMoisture);
             const soilMoisturePercentage = (rawSoilMoisture / 100).toFixed(2);
             
-            // Update sensor displays
-            document.getElementById("temperature").textContent = data.temperature;
-            document.getElementById("humidity").textContent = data.humidity;
-            document.getElementById("soilMoisture").textContent = soilMoisturePercentage;
+            // Get current values before update
+            const currentTemperature = document.getElementById("temperature").textContent;
+            const currentHumidity = document.getElementById("humidity").textContent;
+            const currentSoilMoisture = document.getElementById("soilMoisture").textContent;
+            
+            // Update sensor displays with animation if values have changed and are not placeholders
+            if (currentTemperature !== '--' && currentTemperature !== data.temperature) {
+              animateValue(document.getElementById("temperature"), parseFloat(currentTemperature), parseFloat(data.temperature), 500);
+            } else {
+              document.getElementById("temperature").textContent = data.temperature;
+            }
+            
+            if (currentHumidity !== '--' && currentHumidity !== data.humidity) {
+              animateValue(document.getElementById("humidity"), parseFloat(currentHumidity), parseFloat(data.humidity), 500);
+            } else {
+              document.getElementById("humidity").textContent = data.humidity;
+            }
+            
+            if (currentSoilMoisture !== '--' && currentSoilMoisture !== soilMoisturePercentage) {
+              animateValue(document.getElementById("soilMoisture"), parseFloat(currentSoilMoisture), parseFloat(soilMoisturePercentage), 500);
+            } else {
+              document.getElementById("soilMoisture").textContent = soilMoisturePercentage;
+            }
             
             // Update the last update time
             lastUpdateTime = new Date();
-            document.getElementById('lastUpdateTime').textContent = `Last update: ${formatTime(lastUpdateTime)}`;
+            const currentLang = localStorage.getItem('language') || 'en';
+            document.getElementById('lastUpdateTime').innerHTML = `${translations[currentLang].lastUpdate}: ${formatTime(lastUpdateTime)}`;
             
             // Create a modified data object with the converted soil moisture
             const processedData = {
@@ -611,14 +995,16 @@
         
         ws.onerror = function(event) {
           console.error("WebSocket error occurred");
+          const currentLang = localStorage.getItem('language') || 'en';
           document.getElementById('connectionStatus').className = "status-indicator status-offline";
-          document.getElementById('connectionStatusText').textContent = "Error";
+          document.getElementById('connectionStatusText').textContent = translations[currentLang].error;
         };
         
         ws.onclose = function() {
           console.log("WebSocket connection closed");
+          const currentLang = localStorage.getItem('language') || 'en';
           document.getElementById('connectionStatus').className = "status-indicator status-offline";
-          document.getElementById('connectionStatusText').textContent = "Disconnected";
+          document.getElementById('connectionStatusText').textContent = translations[currentLang].disconnected;
           
           // Schedule reconnection
           reconnectTimer = setTimeout(function() {
@@ -629,8 +1015,9 @@
         
       } catch (error) {
         console.error("Error creating WebSocket:", error);
+        const currentLang = localStorage.getItem('language') || 'en';
         document.getElementById('connectionStatus').className = "status-indicator status-offline";
-        document.getElementById('connectionStatusText').textContent = "Failed";
+        document.getElementById('connectionStatusText').textContent = translations[currentLang].failed;
         
         // Schedule reconnection
         reconnectTimer = setTimeout(function() {
@@ -669,7 +1056,8 @@
       
       // Update the last update time
       lastUpdateTime = new Date();
-      document.getElementById('lastUpdateTime').textContent = `Last update: ${formatTime(lastUpdateTime)}`;
+      const currentLang = localStorage.getItem('language') || 'en';
+      document.getElementById('lastUpdateTime').innerHTML = `${translations[currentLang].lastUpdate}: ${formatTime(lastUpdateTime)}`;
       
       // Update charts with new data
       updateCharts(data, lastUpdateTime);
@@ -678,6 +1066,19 @@
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
       console.log("Initializing dashboard...");
+      
+      // Set initial language based on localStorage or default to English
+      const savedLanguage = localStorage.getItem('language') || 'en';
+      setLanguage(savedLanguage);
+      
+      // Add event listeners for language switcher
+      document.querySelectorAll('.language-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.preventDefault();
+          const lang = this.getAttribute('data-lang');
+          setLanguage(lang);
+        });
+      });
       
       // Initialize charts
       initializeCharts();

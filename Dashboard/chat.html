@@ -8,81 +8,446 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts - For Hindi Support -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Hind:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Animate.css for animations -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
   <style>
     /* Global Styles */
+    :root {
+      --agrisense-green: #2e7d32;
+      --agrisense-light: #60ad5e;
+      --agrisense-dark: #005005;
+      --agrisense-accent: #81c784;
+      --bot-bubble: #e8f5e9;
+      --user-bubble: #e3f2fd;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --transition-time: 0.3s;
+      --text-light: #fafafa;
+      --text-dark: #404040;
+    }
+    
     body {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
+      font-family: 'Poppins', 'Hind', 'Segoe UI', system-ui, -apple-system, sans-serif;
       padding-bottom: 2rem;
+      color: var(--text-dark);
+      transition: all var(--transition-time) ease;
     }
+    
+    body.hindi {
+      font-family: 'Hind', 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    
+    .navbar {
+      padding: 0.8rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .navbar-brand i {
+      font-size: 1.25rem;
+    }
+    
+    .navbar .nav-link {
+      position: relative;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition: all var(--transition-time) ease;
+    }
+    
+    .navbar .nav-link:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: var(--text-light);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: width var(--transition-time) ease;
+    }
+    
+    .navbar .nav-link:hover:after,
+    .navbar .nav-link.active:after {
+      width: 70%;
+    }
+    
     .bg-agrisense {
-      background-color: #2e7d32;
+      background: linear-gradient(135deg, var(--agrisense-green), var(--agrisense-dark));
     }
+    
     .btn-agrisense {
-      background-color: #2e7d32;
-      border-color: #2e7d32;
+      background-color: var(--agrisense-green);
+      border-color: var(--agrisense-green);
       color: white;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.2s;
     }
+    
     .btn-agrisense:hover {
-      background-color: #005005;
-      border-color: #005005;
+      background-color: var(--agrisense-dark);
+      border-color: var(--agrisense-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Chat Container Styles */
+    .chat-container {
+      max-width: 800px;
+      margin: 2.5rem auto;
+      background: #fff;
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      border-radius: 12px;
+      transition: all var(--transition-time) ease;
+    }
+    
+    .chat-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .chat-header-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--agrisense-light);
+      color: white;
+      border-radius: 50%;
+      margin-right: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    .chat-header-text h2 {
+      margin-bottom: 0.15rem;
+      font-weight: 600;
+    }
+    
+    .sensor-status {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background-color: var(--bot-bubble);
+      border-radius: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      transition: all var(--transition-time) ease;
+    }
+    
+    .sensor-status i {
+      margin-right: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-left: 0.5rem;
+      background-color: #dc3545; /* Default to red (disconnected) */
+      position: relative;
+    }
+    
+    .status-connected {
+      background-color: #28a745; /* Green for connected */
+      box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.2);
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+      }
+    }
+    
+    /* Chat Window Styles */
+    .chat-window {
+      height: 450px;
+      overflow-y: auto;
+      padding: 1.25rem;
+      background: #f8f9fa;
+      border-radius: 0.8rem;
+      border: 1px solid rgba(0,0,0,0.05);
+      scroll-behavior: smooth;
+    }
+    
+    .chat-window::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .chat-window::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .chat-window::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    
+    .message {
+      margin-bottom: 1rem;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .message-user {
+      margin-left: auto;
+      margin-right: 10px;
+    }
+    
+    .message-bot {
+      margin-right: auto;
+      margin-left: 10px;
+    }
+    
+    .message-bubble {
+      padding: 0.8rem 1.2rem;
+      border-radius: 1rem;
+      position: relative;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    .message-user .message-bubble {
+      background-color: var(--user-bubble);
+      border-bottom-right-radius: 0.2rem;
+    }
+    
+    .message-bot .message-bubble {
+      background-color: var(--bot-bubble);
+      border-bottom-left-radius: 0.2rem;
+    }
+    
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.3rem;
+      font-size: 1rem;
+    }
+    
+    .message-user .message-avatar {
+      margin-left: auto;
+      background-color: #1976d2;
       color: white;
     }
-    .chat-container {
-      max-width: 700px;
-      margin: 2rem auto;
-      background: #fff;
-      padding: 1.5rem;
-      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-      border-radius: 0.5rem;
+    
+    .message-bot .message-avatar {
+      margin-right: auto;
+      background-color: var(--agrisense-green);
+      color: white;
     }
-    .chat-window {
-      height: 400px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
-      background: #fafafa;
-      border-radius: 0.25rem;
+    
+    .message-time {
+      font-size: 0.7rem;
+      color: #757575;
+      margin-top: 0.3rem;
+      text-align: right;
     }
-    .message {
-      margin: 10px 0;
+    
+    .chat-input-container {
+      margin-top: 1.5rem;
+      position: relative;
     }
-    .user {
-      color: blue;
+    
+    .chat-input {
+      border-radius: 50px;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: all var(--transition-time) ease;
     }
-    .bot {
-      color: darkgreen;
+    
+    .chat-input:focus {
+      border-color: var(--agrisense-green);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    .sensor-status {
-      font-size: 0.9rem;
+    
+    .send-button-container {
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    /* Typing indicator */
+    .typing-indicator {
+      display: none;
       margin-bottom: 1rem;
+      margin-left: 10px;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #757575;
+    }
+    
+    .typing-indicator .dots {
+      display: flex;
+      margin-left: 0.5rem;
+    }
+    
+    .typing-indicator .dot {
+      width: 6px;
+      height: 6px;
+      background-color: #757575;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.5s infinite ease-in-out;
+    }
+    
+    .typing-indicator .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .typing-indicator .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+    
+    /* Suggestions section */
+    .suggestions-container {
+      margin-top: 2rem;
+    }
+    
+    .suggestions-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-dark);
+    }
+    
+    .suggestions-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .suggestion-chip {
+      background-color: #f1f1f1;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition-time) ease;
+    }
+    
+    .suggestion-chip:hover {
+      background-color: var(--agrisense-light);
+      color: white;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .chat-container {
+        margin: 1rem auto;
+        padding: 1.5rem;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      .chat-window {
+        height: 400px;
+      }
+      
+      .navbar-nav {
+        align-items: flex-start;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .chat-container {
+        padding: 1rem;
+        margin: 0.5rem;
+      }
+      
+      .message {
+        max-width: 95%;
+      }
+      
+      .chat-window {
+        height: 350px;
+        padding: 1rem;
+      }
+      
+      .suggestions-chips {
+        flex-direction: column;
+      }
+      
+      .suggestion-chip {
+        width: 100%;
+      }
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <!-- Navigation (similar to your index.html) -->
+  <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-agrisense">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
-        <i class="bi bi-flower1 me-2"></i>Agrisense Dashboard
+        <i class="bi bi-flower1 me-2"></i>
+        <span data-lang-key="brand">Agrisense Dashboard</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Dashboard</a>
+            <a class="nav-link" href="index.html">
+              <i class="bi bi-grid me-1"></i> <span data-lang-key="dashboard">Dashboard</span>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="chat.html">
-              <i class="bi bi-chat-dots me-1"></i>Chat
+              <i class="bi bi-chat-dots me-1"></i> <span data-lang-key="chat">Chat</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="predictions.html">
-              <i class="bi bi-graph-up-arrow me-1"></i>Predictions
+              <i class="bi bi-graph-up-arrow me-1"></i> <span data-lang-key="predictions">Predictions</span>
             </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-globe me-1"></i> <span data-lang-key="language">Language</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item language-option" href="#" data-lang="en">English</a></li>
+              <li><a class="dropdown-item language-option" href="#" data-lang="hi">हिन्दी (Hindi)</a></li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -91,61 +456,283 @@
 
   <!-- Chatbot Interface -->
   <div class="container chat-container">
-    <h2 class="mb-3">Agrisense Chatbot</h2>
+    <div class="chat-header">
+      <div class="chat-header-icon">
+        <i class="bi bi-robot"></i>
+      </div>
+      <div class="chat-header-text">
+        <h2 data-lang-key="chatTitle">Agrisense Assistant</h2>
+        <p class="text-muted mb-0" data-lang-key="chatSubtitle">Ask questions about your farm and sensor data</p>
+      </div>
+    </div>
+    
     <div class="sensor-status">
-      Status: <span id="connectionStatusText">Disconnected</span>
+      <i class="bi bi-broadcast"></i>
+      <span data-lang-key="sensorNetwork">Sensor Network: </span>
+      <span id="connectionStatusText" data-lang-key="disconnected">Disconnected</span>
+      <span class="status-indicator" id="statusIndicator"></span>
     </div>
-    <div id="chatWindow" class="chat-window"></div>
-    <div class="input-group mt-3">
-      <input type="text" id="userInput" class="form-control" placeholder="Ask your question here...">
-      <button id="sendButton" class="btn btn-agrisense">Send</button>
+    
+    <div id="chatWindow" class="chat-window">
+      <!-- Messages will appear here -->
     </div>
-    <div class="mt-3">
-      <p><strong>Try asking:</strong></p>
-      <ul>
-        <li>"Hi" or "Hello"</li>
-        <li>"What is the current sensor data?"</li>
-        <li>"Explain these sensor readings."</li>
-        <li>"What crops can I plant in this season?"</li>
-        <li>"Is my crop affected from a disease?"</li>
-        <li>"What is the growth rate of my crop?"</li>
-        <li>"Bye"</li>
-      </ul>
+    
+    <div class="typing-indicator" id="typingIndicator">
+      <span data-lang-key="typing">Agrisense is typing</span>
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <input type="text" id="userInput" class="form-control chat-input" 
+             placeholder="Type your question here..." autocomplete="off">
+      <div class="send-button-container">
+        <button id="sendButton" class="btn btn-agrisense">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="suggestions-container">
+      <div class="suggestions-title" data-lang-key="quickQuestions">Quick questions:</div>
+      <div class="suggestions-chips">
+        <button class="suggestion-chip" data-text="What is the current sensor data?">
+          <span data-lang-key="currentSensorData">Current sensor data</span>
+        </button>
+        <button class="suggestion-chip" data-text="Explain these sensor readings.">
+          <span data-lang-key="explainReadings">Explain readings</span>
+        </button>
+        <button class="suggestion-chip" data-text="What crops can I plant in this season?">
+          <span data-lang-key="cropRecommendations">Crop recommendations</span>
+        </button>
+        <button class="suggestion-chip" data-text="Is my crop affected from a disease?">
+          <span data-lang-key="diseaseDetection">Disease detection</span>
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- Bootstrap JS Bundle with Popper -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
-    /***** Global Sensor Data & WebSocket Integration *****/
+    /***** Language Translations *****/
+    const translations = {
+      en: {
+        // Navigation
+        brand: "Agrisense Dashboard",
+        dashboard: "Dashboard",
+        chat: "Chat",
+        predictions: "Predictions",
+        language: "Language",
+        
+        // Chat Interface
+        chatTitle: "Agrisense Assistant",
+        chatSubtitle: "Ask questions about your farm and sensor data",
+        sensorNetwork: "Sensor Network: ",
+        inputPlaceholder: "Type your question here...",
+        typing: "Agrisense is typing",
+        quickQuestions: "Quick questions:",
+        
+        // Connection Status
+        connected: "Connected",
+        disconnected: "Disconnected",
+        connecting: "Connecting...",
+        error: "Error",
+        failed: "Failed",
+        
+        // Suggestion Chips
+        currentSensorData: "Current sensor data",
+        explainReadings: "Explain readings",
+        cropRecommendations: "Crop recommendations",
+        diseaseDetection: "Disease detection",
+        
+        // Bot Responses
+        greeting: "Hello! How can I help you today?",
+        farewell: "Goodbye! Have a great day!",
+        sensorDataResponse: "Right now, the temperature is {temperature} °C, the humidity is {humidity}%, and the soil moisture is {soilMoisture}%.",
+        explainSensorDataResponse: "Temperature shows how warm your field is, humidity tells you how much moisture is in the air, and soil moisture indicates the water available in the soil for plants.",
+        coolConditions: "It's cool now. Consider planting leafy greens like spinach or lettuce.",
+        perfectConditions: "The conditions are perfect. Tomatoes or peppers would be a great choice.",
+        warmConditions: "It's warm now. Crops like eggplant or okra might do well.",
+        sensorUnavailable: "Sensor data is not available right now. Please try again later.",
+        diseaseDetectionResponse: "Crop disease detection is not available yet. Our ML model will update this feature soon.",
+        growthRateResponse: "Crop growth rate information is coming soon. Please check back later for updates.",
+        fallbackResponse: "I'm sorry, I didn't understand that. Please ask about sensor data, crop recommendations, or say hello.",
+        welcome: "Welcome to Agrisense! How can I assist you today? You can ask about current sensor data, crop recommendations, or use one of the quick questions below."
+      },
+      hi: {
+        // Navigation
+        brand: "एग्रीसेंस डैशबोर्ड",
+        dashboard: "डैशबोर्ड",
+        chat: "चैट",
+        predictions: "भविष्यवाणियाँ",
+        language: "भाषा",
+        
+        // Chat Interface
+        chatTitle: "एग्रीसेंस सहायक",
+        chatSubtitle: "अपने खेत और सेंसर डेटा के बारे में प्रश्न पूछें",
+        sensorNetwork: "सेंसर नेटवर्क: ",
+        inputPlaceholder: "यहां अपना प्रश्न लिखें...",
+        typing: "एग्रीसेंस टाइप कर रहा है",
+        quickQuestions: "त्वरित प्रश्न:",
+        
+        // Connection Status
+        connected: "कनेक्टेड",
+        disconnected: "डिस्कनेक्टेड",
+        connecting: "कनेक्ट हो रहा है...",
+        error: "त्रुटि",
+        failed: "विफल",
+        
+        // Suggestion Chips
+        currentSensorData: "वर्तमान सेंसर डेटा",
+        explainReadings: "रीडिंग समझाएं",
+        cropRecommendations: "फसल सिफारिशें",
+        diseaseDetection: "रोग का पता लगाना",
+        
+        // Bot Responses
+        greeting: "नमस्ते! मैं आपकी कैसे मदद कर सकता हूँ?",
+        farewell: "अलविदा! आपका दिन शुभ हो!",
+        sensorDataResponse: "अभी, तापमान {temperature} °C है, आर्द्रता {humidity}% है, और मिट्टी की नमी {soilMoisture}% है।",
+        explainSensorDataResponse: "तापमान दिखाता है कि आपका खेत कितना गर्म है, आर्द्रता बताती है कि हवा में कितनी नमी है, और मिट्टी की नमी पौधों के लिए मिट्टी में उपलब्ध पानी को दर्शाती है।",
+        coolConditions: "अभी ठंडा है। पालक या सलाद जैसे पत्तेदार साग उगाने पर विचार करें।",
+        perfectConditions: "स्थितियां बिल्कुल सही हैं। टमाटर या शिमला मिर्च एक बढ़िया विकल्प होगा।",
+        warmConditions: "अभी गर्म है। बैंगन या भिंडी जैसी फसलें अच्छी हो सकती हैं।",
+        sensorUnavailable: "सेंसर डेटा अभी उपलब्ध नहीं है। कृपया बाद में फिर से प्रयास करें।",
+        diseaseDetectionResponse: "फसल रोग का पता लगाना अभी उपलब्ध नहीं है। हमारा एमएल मॉडल जल्द ही इस सुविधा को अपडेट करेगा।",
+        growthRateResponse: "फसल विकास दर की जानकारी जल्द ही आ रही है। अपडेट के लिए बाद में फिर से जांचें।",
+        fallbackResponse: "मुझे खेद है, मैं समझ नहीं पाया। कृपया सेंसर डेटा, फसल सिफारिशों के बारे में पूछें, या नमस्ते कहें।",
+        welcome: "एग्रीसेंस में आपका स्वागत है! मैं आपकी कैसे सहायता कर सकता हूँ? आप वर्तमान सेंसर डेटा, फसल सिफारिशों के बारे में पूछ सकते हैं, या नीचे दिए गए त्वरित प्रश्नों का उपयोग कर सकते हैं।"
+      }
+    };
+    
+    /***** Global Variables & Configuration *****/
+    let currentLanguage = 'en';
+    
+    // Sensor Data & WebSocket Configuration
     let sensorData = {
       temperature: "--",
       humidity: "--",
       soilMoisture: "--"
     };
 
-    // Use the same WebSocket parameters as index.html
     const wsHost = "192.168.76.140";
     const wsPort = "5000";
     let ws = null;
     let reconnectTimer = null;
     const reconnectInterval = 5000; // 5 seconds
-
+    
+    /***** Language Switcher Functions *****/
+    function setLanguage(lang) {
+      if (!translations[lang]) {
+        console.error(`Language '${lang}' not supported.`);
+        return;
+      }
+      
+      currentLanguage = lang;
+      
+      // Update body class for font family
+      if (lang === 'hi') {
+        document.body.classList.add('hindi');
+      } else {
+        document.body.classList.remove('hindi');
+      }
+      
+      // Update all elements with data-lang-key attribute
+      document.querySelectorAll('[data-lang-key]').forEach(element => {
+        const key = element.getAttribute('data-lang-key');
+        if (translations[lang][key]) {
+          element.textContent = translations[lang][key];
+        }
+      });
+      
+      // Update input placeholder
+      document.getElementById('userInput').placeholder = translations[lang].inputPlaceholder;
+      
+      // Update suggestion chip data-text attributes
+      document.querySelectorAll('.suggestion-chip').forEach((chip, index) => {
+        const questionTexts = [
+          "What is the current sensor data?", 
+          "Explain these sensor readings.", 
+          "What crops can I plant in this season?",
+          "Is my crop affected from a disease?"
+        ];
+        
+        const hindiQuestionTexts = [
+          "वर्तमान सेंसर डेटा क्या है?",
+          "इन सेंसर रीडिंग्स की व्याख्या करें।",
+          "इस मौसम में मैं कौन सी फसल लगा सकता हूँ?",
+          "क्या मेरी फसल किसी बीमारी से प्रभावित है?"
+        ];
+        
+        chip.setAttribute('data-text', lang === 'en' ? questionTexts[index] : hindiQuestionTexts[index]);
+      });
+      
+      // Update connection status text based on current status
+      updateConnectionStatus(document.getElementById('connectionStatusText').textContent);
+      
+      // Highlight the active language in dropdown
+      document.querySelectorAll('.language-option').forEach(option => {
+        if (option.getAttribute('data-lang') === lang) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+      
+      // Save language preference
+      localStorage.setItem('language', lang);
+    }
+    
+    /***** WebSocket Connection Functions *****/
     function updateConnectionStatus(status) {
-      document.getElementById('connectionStatusText').textContent = status;
+      const statusIndicator = document.getElementById('statusIndicator');
+      const statusText = document.getElementById('connectionStatusText');
+      
+      let localizedStatus = status;
+      
+      // Translate status terms if needed
+      if (currentLanguage === 'hi') {
+        if (status === 'Connected') localizedStatus = translations.hi.connected;
+        else if (status === 'Disconnected') localizedStatus = translations.hi.disconnected;
+        else if (status === 'Connecting...') localizedStatus = translations.hi.connecting;
+        else if (status === 'Error') localizedStatus = translations.hi.error;
+        else if (status === 'Failed') localizedStatus = translations.hi.failed;
+      } else {
+        if (status === translations.hi.connected) localizedStatus = 'Connected';
+        else if (status === translations.hi.disconnected) localizedStatus = 'Disconnected';
+        else if (status === translations.hi.connecting) localizedStatus = 'Connecting...';
+        else if (status === translations.hi.error) localizedStatus = 'Error';
+        else if (status === translations.hi.failed) localizedStatus = 'Failed';
+      }
+      
+      statusText.textContent = localizedStatus;
+      
+      if (status === 'Connected' || status === translations.hi.connected) {
+        statusIndicator.classList.add('status-connected');
+        statusText.style.color = "#28a745";
+      } else {
+        statusIndicator.classList.remove('status-connected');
+        statusText.style.color = (status === 'Connecting...' || status === translations.hi.connecting) ? "#ffc107" : "#dc3545";
+      }
     }
 
-    // Connect to sensor data WebSocket
     function connectWebSocket() {
       if (reconnectTimer) clearTimeout(reconnectTimer);
       if (ws) ws.close();
-      updateConnectionStatus("Connecting...");
+      
+      updateConnectionStatus(currentLanguage === 'en' ? 'Connecting...' : translations.hi.connecting);
+      
       try {
         ws = new WebSocket(`ws://${wsHost}:${wsPort}`);
+        
         ws.onopen = function() {
-          updateConnectionStatus("Connected");
+          updateConnectionStatus(currentLanguage === 'en' ? 'Connected' : translations.hi.connected);
           console.log("WebSocket connected.");
         };
+        
         ws.onmessage = function(event) {
           try {
             const data = JSON.parse(event.data);
@@ -156,116 +743,214 @@
             console.error("Error processing WebSocket message:", error);
           }
         };
+        
         ws.onerror = function() {
-          updateConnectionStatus("Error");
+          updateConnectionStatus(currentLanguage === 'en' ? 'Error' : translations.hi.error);
           console.error("WebSocket error occurred.");
         };
+        
         ws.onclose = function() {
-          updateConnectionStatus("Disconnected");
+          updateConnectionStatus(currentLanguage === 'en' ? 'Disconnected' : translations.hi.disconnected);
           console.log("WebSocket closed. Reconnecting in", reconnectInterval, "ms.");
           reconnectTimer = setTimeout(connectWebSocket, reconnectInterval);
         };
       } catch (error) {
         console.error("Error creating WebSocket connection:", error);
-        updateConnectionStatus("Failed");
+        updateConnectionStatus(currentLanguage === 'en' ? 'Failed' : translations.hi.failed);
         reconnectTimer = setTimeout(connectWebSocket, reconnectInterval);
       }
     }
 
     /***** Chatbot Fulfillment Functions *****/
     function getRealTimeSensorData() {
-      return `Right now, the temperature is ${sensorData.temperature} °C, the humidity is ${sensorData.humidity}%, and the soil moisture is ${sensorData.soilMoisture}%.`;
+      const template = translations[currentLanguage].sensorDataResponse;
+      return template
+        .replace('{temperature}', sensorData.temperature)
+        .replace('{humidity}', sensorData.humidity)
+        .replace('{soilMoisture}', sensorData.soilMoisture);
     }
 
     function explainSensorData() {
-      return "Temperature shows how warm your field is, humidity tells you how much moisture is in the air, and soil moisture indicates the water available in the soil for plants.";
+      return translations[currentLanguage].explainSensorDataResponse;
     }
 
     function getCropRecommendations() {
       const currentTemp = parseFloat(sensorData.temperature);
       if (isNaN(currentTemp)) {
-        return "Sensor data is not available right now. Please try again later.";
+        return translations[currentLanguage].sensorUnavailable;
       } else if (currentTemp < 23) {
-        return "It’s cool now. Consider planting leafy greens like spinach or lettuce.";
+        return translations[currentLanguage].coolConditions;
       } else if (currentTemp >= 23 && currentTemp <= 28) {
-        return "The conditions are perfect. Tomatoes or peppers would be a great choice.";
+        return translations[currentLanguage].perfectConditions;
       } else {
-        return "It’s warm now. Crops like eggplant or okra might do well.";
+        return translations[currentLanguage].warmConditions;
       }
     }
 
     function getDiseaseDetectionResponse() {
-      // Placeholder response for crop disease detection ML model
-      return "Crop disease detection is not available yet. Our ML model will update this feature soon.";
+      return translations[currentLanguage].diseaseDetectionResponse;
     }
 
     function getGrowthRateResponse() {
-      // Placeholder response for crop growth rate analysis ML model
-      return "Crop growth rate information is coming soon. Please check back later for updates.";
+      return translations[currentLanguage].growthRateResponse;
     }
 
     function getGreetingResponse() {
-      return "Hello! How can I help you today?";
+      return translations[currentLanguage].greeting;
     }
 
     function getFarewellResponse() {
-      return "Goodbye! Have a great day!";
+      return translations[currentLanguage].farewell;
     }
 
     /***** Chatbot Interaction Handler *****/
-    document.getElementById('sendButton').addEventListener('click', function() {
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function addMessage(sender, message) {
       const chatWindow = document.getElementById('chatWindow');
-      const userInput = document.getElementById('userInput');
-      const userQuery = userInput.value.trim();
-      if (!userQuery) return;
-
-      // Append the user's message to the chat window
-      chatWindow.innerHTML += `<p class="message user"><strong>You:</strong> ${userQuery}</p>`;
+      const time = getCurrentTime();
+      
+      const messageClass = sender === 'user' ? 'message-user' : 'message-bot';
+      const avatar = sender === 'user' ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-robot"></i>';
+      
+      const messageHTML = `
+        <div class="message ${messageClass}">
+          <div class="message-avatar">${avatar}</div>
+          <div class="message-bubble">${message}</div>
+          <div class="message-time">${time}</div>
+        </div>
+      `;
+      
+      chatWindow.innerHTML += messageHTML;
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    
+    function showTypingIndicator() {
+      document.getElementById('typingIndicator').style.display = 'flex';
+      const chatWindow = document.getElementById('chatWindow');
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+    
+    function hideTypingIndicator() {
+      document.getElementById('typingIndicator').style.display = 'none';
+    }
+    
+    function processChatbotResponse(userQuery) {
       let botResponse = "";
       const queryLower = userQuery.toLowerCase();
 
       // Check for simple greetings
-      if (queryLower.includes("hi") || queryLower.includes("hello") || queryLower.includes("hey")) {
+      if (queryLower.includes("hi") || queryLower.includes("hello") || queryLower.includes("hey") || 
+          queryLower.includes("नमस्ते") || queryLower.includes("हैलो")) {
         botResponse = getGreetingResponse();
       }
       // Check for farewell terms
-      else if (queryLower.includes("bye") || queryLower.includes("goodbye") || queryLower.includes("see you")) {
+      else if (queryLower.includes("bye") || queryLower.includes("goodbye") || queryLower.includes("see you") ||
+               queryLower.includes("अलविदा") || queryLower.includes("फिर मिलेंगे")) {
         botResponse = getFarewellResponse();
       }
-      // Intent: GetRealTimeSensorData (if the query includes sensor, data, or reading)
-      else if (queryLower.includes("sensor") || queryLower.includes("data") || queryLower.includes("reading")) {
+      // Intent: GetRealTimeSensorData
+      else if (queryLower.includes("sensor") || queryLower.includes("data") || queryLower.includes("reading") ||
+               queryLower.includes("सेंसर") || queryLower.includes("डेटा") || queryLower.includes("रीडिंग")) {
         botResponse = getRealTimeSensorData();
       }
-      // Intent: ExplainSensorData (if query asks for explanation)
-      else if (queryLower.includes("explain") || queryLower.includes("what does") || queryLower.includes("mean") || queryLower.includes("interpret")) {
+      // Intent: ExplainSensorData
+      else if (queryLower.includes("explain") || queryLower.includes("what does") || queryLower.includes("mean") || 
+               queryLower.includes("समझाएं") || queryLower.includes("क्या मतलब") || queryLower.includes("अर्थ")) {
         botResponse = explainSensorData();
       }
-      // Intent: CropRecommendations (if query asks about planting or crops)
-      else if (queryLower.includes("crop") || queryLower.includes("plant") || queryLower.includes("grow") || queryLower.includes("season")) {
+      // Intent: CropRecommendations
+      else if (queryLower.includes("crop") || queryLower.includes("plant") || queryLower.includes("grow") || 
+               queryLower.includes("फसल") || queryLower.includes("पौधा") || queryLower.includes("उगाना")) {
         botResponse = getCropRecommendations();
       }
-      // Intent: Disease Detection (if query asks about disease)
-      else if (queryLower.includes("disease") || queryLower.includes("sick") || queryLower.includes("affected")) {
+      // Intent: Disease Detection
+      else if (queryLower.includes("disease") || queryLower.includes("sick") || queryLower.includes("affected") ||
+               queryLower.includes("बीमारी") || queryLower.includes("रोग") || queryLower.includes("प्रभावित")) {
         botResponse = getDiseaseDetectionResponse();
       }
-      // Intent: Growth Rate (if query asks about growth or rate)
-      else if (queryLower.includes("growth") || queryLower.includes("rate")) {
+      // Intent: Growth Rate
+      else if (queryLower.includes("growth") || queryLower.includes("rate") ||
+               queryLower.includes("विकास") || queryLower.includes("वृद्धि") || queryLower.includes("दर")) {
         botResponse = getGrowthRateResponse();
       }
       // Fallback response for unrecognized queries
       else {
-        botResponse = "I'm sorry, I didn't understand that. Please ask about sensor data, crop recommendations, or say hello.";
+        botResponse = translations[currentLanguage].fallbackResponse;
       }
-
-      // Append the bot's response and clear the input field
-      chatWindow.innerHTML += `<p class="message bot"><strong>Bot:</strong> ${botResponse}</p>`;
-      userInput.value = "";
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+      
+      return botResponse;
+    }
+    
+    function handleUserMessage() {
+      const userInput = document.getElementById('userInput');
+      const userQuery = userInput.value.trim();
+      
+      if (!userQuery) return;
+      
+      // Add user message to chat
+      addMessage('user', userQuery);
+      userInput.value = '';
+      
+      // Show typing indicator
+      showTypingIndicator();
+      
+      // Process response with a small delay to simulate thinking/typing
+      setTimeout(() => {
+        // Hide typing indicator
+        hideTypingIndicator();
+        
+        // Process and add bot response
+        const botResponse = processChatbotResponse(userQuery);
+        addMessage('bot', botResponse);
+      }, 1000);
+    }
+    
+    /***** Event Listeners *****/
+    // Send button click
+    document.getElementById('sendButton').addEventListener('click', handleUserMessage);
+    
+    // Enter key press in input field
+    document.getElementById('userInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        handleUserMessage();
+      }
+    });
+    
+    // Suggestion chips
+    document.querySelectorAll('.suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        const text = this.getAttribute('data-text');
+        document.getElementById('userInput').value = text;
+        handleUserMessage();
+      });
+    });
+    
+    // Language selection
+    document.querySelectorAll('.language-option').forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        const lang = this.getAttribute('data-lang');
+        setLanguage(lang);
+      });
     });
 
-    // Initialize WebSocket connection when the page loads
+    /***** Initialize App *****/
     document.addEventListener('DOMContentLoaded', function() {
+      // Load saved language preference or use default
+      const savedLanguage = localStorage.getItem('language') || 'en';
+      setLanguage(savedLanguage);
+      
+      // Start WebSocket connection
       connectWebSocket();
+      
+      // Add welcome message after a brief delay
+      setTimeout(() => {
+        addMessage('bot', translations[currentLanguage].welcome);
+      }, 500);
     });
   </script>
 </body>
