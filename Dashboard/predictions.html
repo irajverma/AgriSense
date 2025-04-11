@@ -8,72 +8,365 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts - Inter for English and Noto Sans for Hindi -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* Global Styles */
+    :root {
+      --primary-color: #2e7d32;
+      --primary-color-dark: #005005;
+      --primary-color-light: #60ad5e;
+      --secondary-color: #f8f9fa;
+      --text-color: #212529;
+      --success-color: #198754;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+      --info-color: #0dcaf0;
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-800: #343a40;
+      --transition: all 0.3s ease;
+      --shadow-sm: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+      --shadow-md: 0 0.5rem 1rem rgba(0,0,0,0.1);
+      --shadow-lg: 0 1rem 2rem rgba(0,0,0,0.15);
+      --border-radius: 0.75rem;
+    }
+    
     body {
-      background-color: #f5f5f5;
+      background-color: #f5f7fa;
+      font-family: 'Inter', 'Noto Sans', sans-serif;
       padding-bottom: 2rem;
+      color: var(--text-color);
+      line-height: 1.6;
     }
+    
+    /* Language specific font adjustments */
+    html[lang="hi"] body {
+      font-family: 'Noto Sans', sans-serif;
+    }
+    
+    html[lang="en"] body {
+      font-family: 'Inter', sans-serif;
+    }
+    
     .bg-agrisense {
-      background-color: #2e7d32;
+      background-color: var(--primary-color);
+      background-image: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
     }
+    
     .btn-agrisense {
-      background-color: #2e7d32;
-      border-color: #2e7d32;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
       color: white;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      font-weight: 500;
+      transition: var(--transition);
     }
+    
     .btn-agrisense:hover {
-      background-color: #005005;
-      border-color: #005005;
+      background-color: var(--primary-color-dark);
+      border-color: var(--primary-color-dark);
       color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
     }
+    
+    /* Navbar Styles */
+    .navbar {
+      box-shadow: var(--shadow-sm);
+      padding: 0.75rem 0;
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .navbar-brand i {
+      color: var(--primary-color-light);
+    }
+    
+    .nav-link {
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: var(--transition);
+    }
+    
+    .nav-link:hover, .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Style adjustments to match index page */
+    .navbar {
+      padding: 0.8rem 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar-brand {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .navbar-brand i {
+      font-size: 1.25rem;
+    }
+    
+    .dropdown-item.language-option {
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      transition: all 0.2s;
+    }
+    
+    .dropdown-item.language-option:hover {
+      background-color: rgba(46, 125, 50, 0.1);
+    }
+    
     /* Container styles for predictions page */
-    .chart-container {
-      max-width: 800px;
+    .dashboard-container {
+      max-width: 1200px;
       margin: 2rem auto;
       padding: 1rem;
-      background: white;
-      box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
-      border-radius: 0.5rem;
     }
+    
+    .chart-card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      border: 1px solid var(--gray-200);
+    }
+    
+    .chart-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      padding-bottom: 1rem;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0;
+      color: var(--gray-800);
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title i {
+      margin-right: 0.5rem;
+      color: var(--primary-color);
+    }
+    
     canvas {
       display: block;
       width: 100% !important;
-      height: auto !important;
+      max-height: 400px;
     }
+    
     /* Health status alert styling */
-    .health-alert {
-      margin-bottom: 1rem;
+    .health-status-container {
+      margin-bottom: 2rem;
+    }
+    
+    .health-card {
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .health-card.healthy {
+      background-color: #f0f9f0;
+      border-left: 5px solid var(--success-color);
+    }
+    
+    .health-card.sick {
+      background-color: #fdf7f7;
+      border-left: 5px solid var(--danger-color);
+    }
+    
+    .health-card.unknown {
+      background-color: #f8f9fa;
+      border-left: 5px solid var(--gray-300);
+    }
+    
+    .health-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+    }
+    
+    .health-icon.healthy {
+      color: var(--success-color);
+    }
+    
+    .health-icon.sick {
+      color: var(--danger-color);
+    }
+    
+    .health-icon.unknown {
+      color: var(--gray-300);
+    }
+    
+    .health-details {
+      flex-grow: 1;
+    }
+    
+    .health-status {
+      font-weight: 600;
       font-size: 1.1rem;
-      text-align: center;
+      margin-bottom: 0.25rem;
+    }
+    
+    .health-description {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      color: var(--gray-800);
+    }
+    
+    /* Loader styles */
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
+    }
+    
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--gray-200);
+      border-bottom-color: var(--primary-color);
+      border-radius: 50%;
+      animation: rotation 1s linear infinite;
+    }
+    
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    
+    /* Stats cards */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 1px solid var(--gray-200);
+    }
+    
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    
+    .stat-title {
+      font-size: 0.875rem;
+      color: var(--gray-800);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      color: var(--primary-color);
+    }
+    
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+    
+    .trend-up {
+      color: var(--success-color);
+    }
+    
+    .trend-down {
+      color: var(--danger-color);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .dashboard-container {
+        padding: 1rem 0.5rem;
+      }
+    }
+    
+          @media (max-width: 768px) {
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-card {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Navigation Bar (same as provided) -->
+  <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-agrisense">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center" href="#">
-        <i class="bi bi-flower1 me-2"></i>Agrisense Dashboard
+        <i class="bi bi-flower1 me-2"></i>
+        <span data-i18n="navbar.brand">Agrisense Dashboard</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Dashboard</a>
+            <a class="nav-link" href="index.html">
+              <i class="bi bi-grid me-1"></i> <span data-i18n="navbar.dashboard">Dashboard</span>
+            </a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="chat.html">
-              <i class="bi bi-chat-dots me-1"></i>Chat
+              <i class="bi bi-chat-dots me-1"></i> <span data-i18n="navbar.chat">Chat</span>
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="predictions.html">
-              <i class="bi bi-graph-up-arrow me-1"></i>Predictions
+              <i class="bi bi-graph-up-arrow me-1"></i> <span data-i18n="navbar.predictions">Predictions</span>
             </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-globe me-1"></i> <span data-i18n="navbar.language">Language</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item language-option" href="#" data-lang="en">English</a></li>
+              <li><a class="dropdown-item language-option" href="#" data-lang="hi">हिन्दी (Hindi)</a></li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -81,11 +374,74 @@
   </nav>
 
   <!-- Predictions Page Content -->
-  <div class="chart-container">
-    <h2 class="mb-4">Plant Growth Predictions</h2>
-    <!-- This div will show the plant health status -->
-    <div id="healthStatus" class="health-alert"></div>
-    <canvas id="growthChart"></canvas>
+  <div class="container dashboard-container">
+    <div class="row mb-4">
+      <div class="col">
+        <h1 class="h3 mb-0" data-i18n="page.title">Plant Growth Predictions</h1>
+        <p class="text-muted" data-i18n="page.subtitle">Real-time growth analysis and health monitoring</p>
+      </div>
+    </div>
+    
+    <!-- Health Status Section -->
+    <div class="health-status-container">
+      <div id="healthStatus"></div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-title" data-i18n="stats.currentHeight">Current Height</div>
+        <div id="currentHeight" class="stat-value">--</div>
+        <div id="heightTrend" class="stat-trend">
+          <i class="bi bi-arrow-up me-1"></i>
+          <span>--</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title" data-i18n="stats.growthRate">Growth Rate</div>
+        <div id="growthRate" class="stat-value">--</div>
+        <div class="text-muted small" data-i18n="stats.cmPerDay">cm per day</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title" data-i18n="stats.predictionAccuracy">Prediction Accuracy</div>
+        <div id="predictionAccuracy" class="stat-value">95%</div>
+        <div class="text-muted small" data-i18n="stats.basedOnHistorical">based on historical data</div>
+      </div>
+    </div>
+    
+    <!-- Main Chart Card -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h5 class="card-title">
+          <i class="bi bi-graph-up"></i>
+          <span data-i18n="chart.title">Plant Growth Trajectory</span>
+        </h5>
+        <div>
+          <button id="refreshButton" class="btn btn-sm btn-agrisense">
+            <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="chart.refresh">Refresh</span>
+          </button>
+        </div>
+      </div>
+      <div id="chartContainer">
+        <div id="loaderContainer" class="loader-container">
+          <div class="loader"></div>
+        </div>
+        <canvas id="growthChart" style="display: none;"></canvas>
+      </div>
+    </div>
+    
+    <!-- Recommendations Card -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h5 class="card-title">
+          <i class="bi bi-lightbulb"></i>
+          <span data-i18n="recommendations.title">Recommendations</span>
+        </h5>
+      </div>
+      <div id="recommendationsContainer">
+        <p class="text-muted text-center" data-i18n="recommendations.loading">Loading recommendations...</p>
+      </div>
+    </div>
   </div>
 
   <!-- Bootstrap JS Bundle with Popper -->
@@ -93,6 +449,146 @@
   <!-- Load Chart.js library from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Translations object
+    const translations = {
+      en: {
+        "navbar.brand": "Agrisense Dashboard",
+        "navbar.dashboard": "Dashboard",
+        "navbar.chat": "Chat",
+        "navbar.predictions": "Predictions",
+        "navbar.language": "Language",
+        "page.title": "Plant Growth Predictions",
+        "page.subtitle": "Real-time growth analysis and health monitoring",
+        "stats.currentHeight": "Current Height",
+        "stats.growthRate": "Growth Rate",
+        "stats.cmPerDay": "cm per day",
+        "stats.predictionAccuracy": "Prediction Accuracy",
+        "stats.basedOnHistorical": "based on historical data",
+        "chart.title": "Plant Growth Trajectory",
+        "chart.refresh": "Refresh",
+        "recommendations.title": "Recommendations",
+        "recommendations.loading": "Loading recommendations...",
+        "health.status.healthy": "Plant Status: Healthy",
+        "health.status.sick": "Plant Status: Sick",
+        "health.status.unknown": "Plant Status: Unknown",
+        "health.desc.healthy": "All parameters within optimal ranges",
+        "health.desc.sick": "Detected issue:",
+        "health.desc.unknown": "Unable to determine current health status",
+        "health.button.details": "View Details",
+        "health.button.check": "Check Now",
+        "error.loading": "Unable to load prediction data. Please try again later.",
+        "recommendations.waterSchedule": "Maintain Watering Schedule",
+        "recommendations.waterDesc": "Current watering pattern is supporting healthy growth.",
+        "recommendations.light": "Light Exposure",
+        "recommendations.lightDesc": "Continue with current light conditions for optimal photosynthesis.",
+        "recommendations.fertilizer": "Next Fertilizer Application",
+        "recommendations.fertilizerDesc": "Schedule next fertilizer application in 7 days.",
+        "recommendations.treatment": "Treat",
+        "recommendations.treatmentDesc": "Apply recommended treatment immediately.",
+        "recommendations.humidity": "Adjust Humidity",
+        "recommendations.humidityDesc": "Increase surrounding humidity to aid recovery.",
+        "recommendations.monitor": "Monitor Closely",
+        "recommendations.monitorDesc": "Check plant status daily for the next week.",
+        "recommendations.moreData": "Gather More Data",
+        "recommendations.moreDataDesc": "Not enough information to provide specific recommendations.",
+        "chart.xAxis": "Time (Days)",
+        "chart.yAxis": "Plant Height (cm)",
+        "chart.dataLabel": "Plant Height (cm)",
+        "trend.noChange": "No change"
+      },
+      hi: {
+        "navbar.brand": "एग्रीसेंस डैशबोर्ड",
+        "navbar.dashboard": "डैशबोर्ड",
+        "navbar.chat": "चैट",
+        "navbar.predictions": "पूर्वानुमान",
+        "navbar.language": "भाषा",
+        "page.title": "पौधे की वृद्धि पूर्वानुमान",
+        "page.subtitle": "वास्तविक समय वृद्धि विश्लेषण और स्वास्थ्य निगरानी",
+        "stats.currentHeight": "वर्तमान ऊंचाई",
+        "stats.growthRate": "वृद्धि दर",
+        "stats.cmPerDay": "सेमी प्रति दिन",
+        "stats.predictionAccuracy": "पूर्वानुमान सटीकता",
+        "stats.basedOnHistorical": "ऐतिहासिक डेटा के आधार पर",
+        "chart.title": "पौधे की वृद्धि प्रक्षेपवक्र",
+        "chart.refresh": "रिफ्रेश करें",
+        "recommendations.title": "अनुशंसाएँ",
+        "recommendations.loading": "अनुशंसाएँ लोड हो रही हैं...",
+        "health.status.healthy": "पौधे की स्थिति: स्वस्थ",
+        "health.status.sick": "पौधे की स्थिति: अस्वस्थ",
+        "health.status.unknown": "पौधे की स्थिति: अज्ञात",
+        "health.desc.healthy": "सभी पैरामीटर इष्टतम सीमा के भीतर",
+        "health.desc.sick": "पहचानी गई समस्या:",
+        "health.desc.unknown": "वर्तमान स्वास्थ्य स्थिति निर्धारित करने में असमर्थ",
+        "health.button.details": "विवरण देखें",
+        "health.button.check": "अभी जांचें",
+        "error.loading": "पूर्वानुमान डेटा लोड करने में असमर्थ। कृपया बाद में पुनः प्रयास करें।",
+        "recommendations.waterSchedule": "पानी देने की अनुसूची बनाए रखें",
+        "recommendations.waterDesc": "वर्तमान पानी देने का पैटर्न स्वस्थ विकास का समर्थन कर रहा है।",
+        "recommendations.light": "प्रकाश एक्सपोज़र",
+        "recommendations.lightDesc": "इष्टतम प्रकाश संश्लेषण के लिए वर्तमान प्रकाश स्थितियों को जारी रखें।",
+        "recommendations.fertilizer": "अगला उर्वरक अनुप्रयोग",
+        "recommendations.fertilizerDesc": "7 दिनों में अगला उर्वरक लगाने की अनुसूची बनाएं।",
+        "recommendations.treatment": "उपचार करें",
+        "recommendations.treatmentDesc": "अनुशंसित उपचार तुरंत लागू करें।",
+        "recommendations.humidity": "आर्द्रता समायोजित करें",
+        "recommendations.humidityDesc": "ठीक होने में सहायता के लिए आसपास की आर्द्रता बढ़ाएं।",
+        "recommendations.monitor": "बारीकी से निगरानी करें",
+        "recommendations.monitorDesc": "अगले सप्ताह के लिए दैनिक पौधे की स्थिति की जांच करें।",
+        "recommendations.moreData": "अधिक डेटा एकत्र करें",
+        "recommendations.moreDataDesc": "विशिष्ट सिफारिशें प्रदान करने के लिए पर्याप्त जानकारी नहीं है।",
+        "chart.xAxis": "समय (दिन)",
+        "chart.yAxis": "पौधे की ऊंचाई (सेमी)",
+        "chart.dataLabel": "पौधे की ऊंचाई (सेमी)",
+        "trend.noChange": "कोई परिवर्तन नहीं"
+      }
+    };
+    
+    // Language management
+    let currentLang = localStorage.getItem('agrisense-lang') || 'en';
+    
+    // Initialize language
+    document.documentElement.lang = currentLang;
+    translatePage();
+    
+    // Add event listeners to language options
+    document.querySelectorAll('.language-option').forEach(option => {
+      option.addEventListener('click', function(e) {
+        e.preventDefault();
+        currentLang = this.getAttribute('data-lang');
+        localStorage.setItem('agrisense-lang', currentLang);
+        document.documentElement.lang = currentLang;
+        translatePage();
+        updateGrowthChart(); // Update chart labels
+      });
+    });
+    
+    // Translate the page content based on the selected language
+    function translatePage() {
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+          element.textContent = translations[currentLang][key];
+        }
+      });
+    }
+    
+    // Function to get translated text
+    function getTranslation(key) {
+      return translations[currentLang][key] || key;
+    }
+    
+    // Show loader
+    function showLoader() {
+      document.getElementById('loaderContainer').style.display = 'flex';
+      document.getElementById('growthChart').style.display = 'none';
+    }
+    
+    // Hide loader
+    function hideLoader() {
+      document.getElementById('loaderContainer').style.display = 'none';
+      document.getElementById('growthChart').style.display = 'block';
+    }
+    
     /**
      * Fetch real-time prediction data from the backend.
      * Expected JSON format:
@@ -117,74 +613,341 @@
       }
     }
 
+    // Chart instance variable
+    let growthChart;
+
     /**
      * Initialize the Chart.js chart.
      */
     function initializeChart() {
       const ctx = document.getElementById('growthChart').getContext('2d');
-      const chart = new Chart(ctx, {
+      growthChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: [],  // To be updated dynamically
           datasets: [{
-            label: 'Plant Height (cm)',
+            label: getTranslation('chart.dataLabel'),
             data: [],   // To be updated dynamically
-            fill: false,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            tension: 0.1
+            fill: true,
+            backgroundColor: 'rgba(46, 125, 50, 0.1)',
+            borderColor: 'rgba(46, 125, 50, 0.8)',
+            tension: 0.4,
+            pointBackgroundColor: 'rgba(46, 125, 50, 1)',
+            pointBorderColor: '#fff',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            pointHoverBackgroundColor: 'rgba(46, 125, 50, 1)',
+            pointHoverBorderColor: '#fff'
           }]
         },
         options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                font: {
+                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              titleFont: {
+                family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                size: 14
+              },
+              bodyFont: {
+                family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                size: 13
+              },
+              padding: 12,
+              cornerRadius: 8
+            }
+          },
           scales: {
             x: {
+              grid: {
+                display: false
+              },
               title: {
                 display: true,
-                text: 'Time (Days)'
+                text: getTranslation('chart.xAxis'),
+                font: {
+                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  weight: '500',
+                  size: 13
+                }
+              },
+              ticks: {
+                font: {
+                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  size: 12
+                }
               }
             },
             y: {
               beginAtZero: true,
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              },
               title: {
                 display: true,
-                text: 'Plant Height (cm)'
+                text: getTranslation('chart.yAxis'),
+                font: {
+                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  weight: '500',
+                  size: 13
+                }
+              },
+              ticks: {
+                font: {
+                  family: currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif",
+                  size: 12
+                }
               }
             }
+          },
+          animation: {
+            duration: 1000,
+            easing: 'easeOutQuart'
           }
         }
       });
-      return chart;
+      return growthChart;
     }
-
-    /**
-     * Update both the chart and the health status display.
-     */
-    async function updateDashboard(chart) {
-      const predictions = await fetchPredictions();
-      
-      // Update the chart data
-      chart.data.labels = predictions.labels;
-      chart.data.datasets[0].data = predictions.values;
-      chart.update();
-
-      // Update the health status display
-      const healthStatusDiv = document.getElementById('healthStatus');
-      if (predictions.status.toLowerCase() === "sick") {
-        // If the plant is sick, display the disease name
-        healthStatusDiv.innerHTML = `<div class="alert alert-danger">Plant Status: Sick – ${predictions.disease}</div>`;
-      } else if (predictions.status.toLowerCase() === "healthy") {
-        healthStatusDiv.innerHTML = `<div class="alert alert-success">Plant Status: Healthy</div>`;
-      } else {
-        healthStatusDiv.innerHTML = `<div class="alert alert-secondary">Plant Status: Unknown</div>`;
+    
+    // Update chart to reflect current language
+    function updateGrowthChart() {
+      if (growthChart) {
+        // Update chart labels and titles
+        growthChart.data.datasets[0].label = getTranslation('chart.dataLabel');
+        growthChart.options.scales.x.title.text = getTranslation('chart.xAxis');
+        growthChart.options.scales.y.title.text = getTranslation('chart.yAxis');
+        
+        // Update font family based on language
+        const fontFamily = currentLang === 'hi' ? "'Noto Sans', sans-serif" : "'Inter', sans-serif";
+        growthChart.options.plugins.legend.labels.font.family = fontFamily;
+        growthChart.options.plugins.tooltip.titleFont.family = fontFamily;
+        growthChart.options.plugins.tooltip.bodyFont.family = fontFamily;
+        growthChart.options.scales.x.title.font.family = fontFamily;
+        growthChart.options.scales.x.ticks.font.family = fontFamily;
+        growthChart.options.scales.y.title.font.family = fontFamily;
+        growthChart.options.scales.y.ticks.font.family = fontFamily;
+        
+        growthChart.update();
       }
     }
 
+    /**
+     * Calculate and update plant statistics
+     */
+    function updateStatistics(values, labels) {
+      if (values.length > 0) {
+        // Current height
+        const currentHeight = values[values.length - 1];
+        document.getElementById('currentHeight').textContent = currentHeight.toFixed(1);
+        
+        // Height trend
+        if (values.length > 1) {
+          const previousHeight = values[values.length - 2];
+          const change = currentHeight - previousHeight;
+          const trendElement = document.getElementById('heightTrend');
+          
+          if (change > 0) {
+            trendElement.innerHTML = `<i class="bi bi-arrow-up me-1 trend-up"></i><span class="trend-up">+${change.toFixed(1)} cm</span>`;
+          } else if (change < 0) {
+            trendElement.innerHTML = `<i class="bi bi-arrow-down me-1 trend-down"></i><span class="trend-down">${change.toFixed(1)} cm</span>`;
+          } else {
+            trendElement.innerHTML = `<i class="bi bi-dash me-1"></i><span>${getTranslation('trend.noChange')}</span>`;
+          }
+        }
+        
+        // Growth rate
+        if (values.length > 1) {
+          const growthRates = [];
+          for (let i = 1; i < values.length; i++) {
+            growthRates.push(values[i] - values[i-1]);
+          }
+          const avgGrowthRate = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
+          document.getElementById('growthRate').textContent = avgGrowthRate.toFixed(2);
+        }
+      }
+    }
+    
+    /**
+     * Generate recommendations based on plant status and growth
+     */
+    function updateRecommendations(status, disease, values) {
+      const container = document.getElementById('recommendationsContainer');
+      let recommendations = '<ul class="list-group list-group-flush">';
+      
+      if (status.toLowerCase() === "healthy") {
+        recommendations += `
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-droplet me-3 text-primary fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.waterSchedule')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.waterDesc')}</p>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-sun me-3 text-warning fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.light')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.lightDesc')}</p>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-calendar-check me-3 text-success fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.fertilizer')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.fertilizerDesc')}</p>
+            </div>
+          </li>
+        `;
+      } else if (status.toLowerCase() === "sick") {
+        recommendations += `
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle me-3 text-danger fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.treatment')} ${disease}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.treatmentDesc')}</p>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-moisture me-3 text-info fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.humidity')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.humidityDesc')}</p>
+            </div>
+          </li>
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-eye me-3 text-primary fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.monitor')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.monitorDesc')}</p>
+            </div>
+          </li>
+        `;
+      } else {
+        recommendations += `
+          <li class="list-group-item d-flex align-items-center">
+            <i class="bi bi-question-circle me-3 text-secondary fs-4"></i>
+            <div>
+              <h6 class="mb-1">${getTranslation('recommendations.moreData')}</h6>
+              <p class="mb-0 text-muted small">${getTranslation('recommendations.moreDataDesc')}</p>
+            </div>
+          </li>
+        `;
+      }
+      
+      recommendations += '</ul>';
+      container.innerHTML = recommendations;
+    }
+    
+    /**
+     * Update the health status display.
+     */
+    function updateHealthStatus(status, disease) {
+      const healthStatusDiv = document.getElementById('healthStatus');
+      
+      if (status.toLowerCase() === "sick") {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card sick">
+            <div class="health-icon sick">
+              <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.sick')}</div>
+              <div class="health-description">${getTranslation('health.desc.sick')} ${disease}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-danger ms-auto">${getTranslation('health.button.details')}</button>
+          </div>
+        `;
+      } else if (status.toLowerCase() === "healthy") {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card healthy">
+            <div class="health-icon healthy">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.healthy')}</div>
+              <div class="health-description">${getTranslation('health.desc.healthy')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-success ms-auto">${getTranslation('health.button.details')}</button>
+          </div>
+        `;
+      } else {
+        healthStatusDiv.innerHTML = `
+          <div class="health-card unknown">
+            <div class="health-icon unknown">
+              <i class="bi bi-question-circle"></i>
+            </div>
+            <div class="health-details">
+              <div class="health-status">${getTranslation('health.status.unknown')}</div>
+              <div class="health-description">${getTranslation('health.desc.unknown')}</div>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary ms-auto">${getTranslation('health.button.check')}</button>
+          </div>
+        `;
+      }
+    }
+
+    /**
+     * Update the dashboard with the latest data.
+     */
+    async function updateDashboard(chart) {
+      showLoader();
+      
+      try {
+        const predictions = await fetchPredictions();
+        
+        // Update the chart data
+        chart.data.labels = predictions.labels;
+        chart.data.datasets[0].data = predictions.values;
+        chart.update();
+        
+        // Update statistics cards
+        updateStatistics(predictions.values, predictions.labels);
+        
+        // Update the health status display
+        updateHealthStatus(predictions.status, predictions.disease);
+        
+        // Update recommendations
+        updateRecommendations(predictions.status, predictions.disease, predictions.values);
+        
+        hideLoader();
+      } catch (error) {
+        console.error('Error updating dashboard:', error);
+        hideLoader();
+        
+        // Show error message
+        const chartContainer = document.getElementById('chartContainer');
+        chartContainer.innerHTML = `
+          <div class="alert alert-danger text-center">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            ${getTranslation('error.loading')}
+          </div>
+        `;
+      }
+    }
+    
     // Initialize the chart and update the dashboard immediately.
-    const growthChart = initializeChart();
-    updateDashboard(growthChart);
+    const chart = initializeChart();
+    updateDashboard(chart);
+    
+    // Add event listener for refresh button
+    document.getElementById('refreshButton').addEventListener('click', () => {
+      updateDashboard(chart);
+    });
 
     // Refresh the dashboard every 30 seconds.
     setInterval(() => {
-      updateDashboard(growthChart);
+      updateDashboard(chart);
     }, 30000);
   </script>
 </body>
