@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Predictions - Agrisense Dashboard</title>
+  <title>Corn Growth Predictions - Agrisense Dashboard</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
   <!-- Google Fonts - For Hindi Support -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Hind:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <style>
     :root {
       --primary-color: #2e7d32;
@@ -363,6 +365,28 @@
       opacity: 0.95;
     }
     
+    /* Prediction history table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .history-table th, .history-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .history-table th {
+      font-weight: 600;
+      background-color: var(--gray-100);
+    }
+    
+    .history-table tbody tr:hover {
+      background-color: rgba(46, 125, 50, 0.05);
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 992px) {
       .dashboard-container {
@@ -431,7 +455,7 @@
   <div class="container dashboard-container">
     <div class="row mb-3">
       <div class="col">
-        <h1 class="h3 mb-0" data-i18n="page.title">Plant Growth Predictions</h1>
+        <h1 class="h3 mb-0" data-i18n="page.title">Corn Growth Predictions</h1>
         <p class="text-muted" data-i18n="page.subtitle">Real-time growth analysis and health monitoring</p>
       </div>
     </div>
@@ -454,37 +478,46 @@
       <div class="card-header">
         <h5 class="card-title">
           <i class="bi bi-sliders"></i>
-          <span data-i18n="sensor.title">Sensor Readings</span>
+          <span data-i18n="sensor.title">Growth Parameters</span>
         </h5>
       </div>
       <div class="card-body">
         <form id="sensorForm" class="row g-3">
           <div class="col-md-4">
-            <label for="Temperature(C)" class="form-label" data-i18n="sensor.temperature">Temperature (°C)</label>
-            <input type="number" class="form-control" id="Temperature(C)" min="10" max="40" step="0.1" value="25.0" required>
+            <label for="DaysSincePlanting" class="form-label" data-i18n="sensor.daysPlanted">Days Since Planting</label>
+            <input type="number" class="form-control" id="DaysSincePlanting" name="DaysSincePlanting" min="1" max="150" value="30" required>
           </div>
           <div class="col-md-4">
-            <label for="Humidity(%)" class="form-label" data-i18n="sensor.humidity">Humidity (%)</label>
-            <input type="number" class="form-control" id="Humidity(%)" min="0" max="100" step="0.1" value="60.0" required>
+            <label for="Temperature" class="form-label" data-i18n="sensor.temperature">Temperature (°C)</label>
+            <input type="number" class="form-control" id="Temperature" name="Temperature" min="10" max="40" step="0.1" value="25.0" required>
           </div>
           <div class="col-md-4">
-            <label for="SoilMoisture(%)" class="form-label" data-i18n="sensor.soilMoisture">Soil Moisture (%)</label>
-            <input type="number" class="form-control" id="SoilMoisture(%)" min="0" max="100" step="0.1" value="45.0" required>
-          </div>
-          <div class="col-md-4">
-            <label for="LightIntensity(lux)" class="form-label" data-i18n="sensor.lightIntensity">Light Intensity (lux)</label>
-            <input type="number" class="form-control" id="LightIntensity(lux)" min="0" max="50000" step="100" value="8000" required>
+            <label for="Rainfall" class="form-label" data-i18n="sensor.rainfall">Rainfall (mm)</label>
+            <input type="number" class="form-control" id="Rainfall" name="Rainfall" min="0" max="500" step="0.1" value="150.0" required>
           </div>
           <div class="col-md-4">
             <label for="SoilpH" class="form-label" data-i18n="sensor.soilPh">Soil pH</label>
-            <input type="number" class="form-control" id="SoilpH" min="4" max="9" step="0.1" value="6.5" required>
+            <input type="number" class="form-control" id="SoilpH" name="SoilpH" min="4" max="9" step="0.1" value="6.5" required>
           </div>
           <div class="col-md-4">
-            <label for="DaysSincePlanting" class="form-label" data-i18n="sensor.daysPlanted">Days Since Planting</label>
-            <input type="number" class="form-control" id="DaysSincePlanting" min="1" max="200" value="30" required>
+            <label for="NitrogenLevel" class="form-label" data-i18n="sensor.nitrogen">Nitrogen Level (mg/kg)</label>
+            <input type="number" class="form-control" id="NitrogenLevel" name="NitrogenLevel" min="0" max="200" value="80" required>
+          </div>
+          <div class="col-md-4">
+            <label for="PhosphorusLevel" class="form-label" data-i18n="sensor.phosphorus">Phosphorus Level (mg/kg)</label>
+            <input type="number" class="form-control" id="PhosphorusLevel" name="PhosphorusLevel" min="0" max="200" value="40" required>
+          </div>
+          <div class="col-md-4">
+            <label for="PotassiumLevel" class="form-label" data-i18n="sensor.potassium">Potassium Level (mg/kg)</label>
+            <input type="number" class="form-control" id="PotassiumLevel" name="PotassiumLevel" min="0" max="200" value="60" required>
+          </div>
+          <div class="col-md-4">
+            <label for="SunlightHours" class="form-label" data-i18n="sensor.sunlight">Daily Sunlight Hours</label>
+            <input type="number" class="form-control" id="SunlightHours" name="SunlightHours" min="0" max="24" step="0.1" value="12" required>
           </div>
           <div class="col-12 mt-3">
             <button type="submit" class="btn btn-agrisense" data-i18n="sensor.predict">Predict Growth</button>
+            <button type="button" id="simulateBtn" class="btn btn-outline-secondary ms-2" data-i18n="sensor.simulate">Simulate Growth</button>
             <button type="button" id="autoFillBtn" class="btn btn-outline-secondary ms-2" data-i18n="sensor.autoFill">Auto-Fill</button>
           </div>
         </form>
@@ -523,7 +556,7 @@
       <div class="card-header">
         <h5 class="card-title">
           <i class="bi bi-graph-up"></i>
-          <span data-i18n="chart.title">Plant Growth Trajectory</span>
+          <span data-i18n="chart.title">Growth Trajectory</span>
         </h5>
         <div>
           <button id="refreshButton" class="btn btn-sm btn-agrisense">
@@ -536,6 +569,40 @@
           <div class="loader"></div>
         </div>
         <canvas id="growthChart" style="display: none;"></canvas>
+      </div>
+    </div>
+    
+    <!-- Prediction History Table -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h5 class="card-title">
+          <i class="bi bi-table"></i>
+          <span data-i18n="history.title">Prediction History</span>
+        </h5>
+        <div>
+          <button id="clearHistoryBtn" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-trash me-1"></i><span data-i18n="history.clear">Clear</span>
+          </button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="history-table" id="historyTable">
+          <thead>
+            <tr>
+              <th data-i18n="history.days">Days</th>
+              <th data-i18n="history.temperature">Temperature</th>
+              <th data-i18n="history.rainfall">Rainfall</th>
+              <th data-i18n="history.ph">pH</th>
+              <th data-i18n="history.sunlight">Sunlight</th>
+              <th data-i18n="history.height">Height (cm)</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td colspan="6" class="text-center text-muted" data-i18n="history.noData">No prediction data available</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     
@@ -558,8 +625,7 @@
 
   <!-- Bootstrap JS Bundle with Popper -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  <!-- Load Chart.js library from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <script>
     // Translations object
     const translations = {
@@ -569,17 +635,17 @@
         "navbar.chat": "Chat",
         "navbar.predictions": "Predictions",
         "navbar.language": "Language",
-        "page.title": "Plant Growth Predictions",
+        "page.title": "Corn Growth Predictions",
         "page.subtitle": "Real-time growth analysis and health monitoring",
         "stats.currentHeight": "Current Height",
         "stats.predictedHeight": "Predicted Height",
         "stats.inDays": "in coming days",
         "stats.growthRate": "Growth Rate",
         "stats.cmPerDay": "cm per day",
-        "chart.title": "Plant Growth Trajectory",
+        "chart.title": "Growth Trajectory",
         "chart.refresh": "Refresh",
         "recommendations.title": "Recommendations",
-        "recommendations.loading": "Submit sensor data to get recommendations",
+        "recommendations.loading": "Submit parameters to get recommendations",
         "health.status.healthy": "Plant Status: Healthy",
         "health.status.sick": "Plant Status: At Risk",
         "health.status.unknown": "Plant Status: Needs Assessment",
@@ -613,17 +679,29 @@
         "status.error": "Connection error",
         "lastUpdate": "Last update",
         "never": "Never",
-        "sensor.title": "Sensor Readings",
+        "sensor.title": "Growth Parameters",
         "sensor.temperature": "Temperature (°C)",
-        "sensor.humidity": "Humidity (%)",
-        "sensor.soilMoisture": "Soil Moisture (%)",
-        "sensor.lightIntensity": "Light Intensity (lux)",
+        "sensor.rainfall": "Rainfall (mm)",
         "sensor.soilPh": "Soil pH",
+        "sensor.nitrogen": "Nitrogen Level (mg/kg)",
+        "sensor.phosphorus": "Phosphorus Level (mg/kg)",
+        "sensor.potassium": "Potassium Level (mg/kg)",
+        "sensor.sunlight": "Daily Sunlight Hours",
         "sensor.daysPlanted": "Days Since Planting",
         "sensor.predict": "Predict Growth",
+        "sensor.simulate": "Simulate Growth",
         "sensor.autoFill": "Auto-Fill",
         "prediction.success": "Prediction successful",
-        "prediction.error": "Prediction failed"
+        "prediction.error": "Prediction failed",
+        "history.title": "Prediction History",
+        "history.days": "Days",
+        "history.temperature": "Temperature",
+        "history.rainfall": "Rainfall",
+        "history.ph": "pH",
+        "history.sunlight": "Sunlight",
+        "history.height": "Height (cm)",
+        "history.noData": "No prediction data available",
+        "history.clear": "Clear"
       },
       hi: {
         "navbar.brand": "एग्रीसेंस डैशबोर्ड",
@@ -631,22 +709,22 @@
         "navbar.chat": "चैट",
         "navbar.predictions": "पूर्वानुमान",
         "navbar.language": "भाषा",
-        "page.title": "पौधे की वृद्धि पूर्वानुमान",
-        "page.subtitle": "वास्तविक समय वृद्धि विश्लेषण और स्वास्थ्य निगरानी",
+        "page.title": "मक्का विकास पूर्वानुमान",
+        "page.subtitle": "वास्तविक समय विकास विश्लेषण और स्वास्थ्य निगरानी",
         "stats.currentHeight": "वर्तमान ऊंचाई",
         "stats.predictedHeight": "अनुमानित ऊंचाई",
         "stats.inDays": "आने वाले दिनों में",
-        "stats.growthRate": "वृद्धि दर",
+        "stats.growthRate": "विकास दर",
         "stats.cmPerDay": "सेमी प्रति दिन",
-        "chart.title": "पौधे की वृद्धि प्रक्षेपवक्र",
+        "chart.title": "विकास प्रक्षेपवक्र",
         "chart.refresh": "रिफ्रेश करें",
         "recommendations.title": "अनुशंसाएँ",
-        "recommendations.loading": "अनुशंसाएँ प्राप्त करने के लिए सेंसर डेटा जमा करें",
+        "recommendations.loading": "अनुशंसाएँ प्राप्त करने के लिए पैरामीटर जमा करें",
         "health.status.healthy": "पौधे की स्थिति: स्वस्थ",
         "health.status.sick": "पौधे की स्थिति: जोखिम में",
         "health.status.unknown": "पौधे की स्थिति: मूल्यांकन आवश्यक",
-        "health.desc.healthy": "वृद्धि अपेक्षित सीमाओं के साथ चल रही है",
-        "health.desc.sick": "वृद्धि अपेक्षित दर से कम है",
+        "health.desc.healthy": "विकास अपेक्षित सीमाओं के साथ चल रही है",
+        "health.desc.sick": "विकास अपेक्षित दर से कम है",
         "health.desc.unknown": "स्वास्थ्य स्थिति निर्धारित करने के लिए अपर्याप्त डेटा",
         "health.button.details": "विवरण देखें",
         "health.button.check": "अभी जांचें",
@@ -658,9 +736,9 @@
         "recommendations.fertilizer": "अगला उर्वरक अनुप्रयोग",
         "recommendations.fertilizerDesc": "7 दिनों में अगला उर्वरक लगाने की अनुसूची बनाएं।",
         "recommendations.treatment": "स्थितियों को समायोजित करें",
-        "recommendations.treatmentDesc": "वर्तमान वृद्धि दर अपेक्षित सीमा से कम है।",
+        "recommendations.treatmentDesc": "वर्तमान विकास दर अपेक्षित सीमा से कम है।",
         "recommendations.humidity": "आर्द्रता समायोजित करें",
-        "recommendations.humidityDesc": "वृद्धि में सहायता के लिए आसपास की आर्द्रता बढ़ाएं।",
+        "recommendations.humidityDesc": "विकास में सहायता के लिए आसपास की आर्द्रता बढ़ाएं।",
         "recommendations.monitor": "बारीकी से निगरानी करें",
         "recommendations.monitorDesc": "अगले सप्ताह के लिए दैनिक पौधे की स्थिति की जांच करें।",
         "recommendations.moreData": "अधिक डेटा एकत्र करें",
@@ -675,23 +753,33 @@
         "status.error": "कनेक्शन त्रुटि",
         "lastUpdate": "अंतिम अपडेट",
         "never": "कभी नहीं",
-        "sensor.title": "सेंसर पठन",
+        "sensor.title": "विकास मापदंड",
         "sensor.temperature": "तापमान (°C)",
-        "sensor.humidity": "आर्द्रता (%)",
-        "sensor.soilMoisture": "मिट्टी की नमी (%)",
-        "sensor.lightIntensity": "प्रकाश की तीव्रता (lux)",
+        "sensor.rainfall": "वर्षा (मिमी)",
         "sensor.soilPh": "मिट्टी का पीएच",
+        "sensor.nitrogen": "नाइट्रोजन स्तर (मिग्रा/किग्रा)",
+        "sensor.phosphorus": "फास्फोरस स्तर (मिग्रा/किग्रा)",
+        "sensor.potassium": "पोटेशियम स्तर (मिग्रा/किग्रा)",
+        "sensor.sunlight": "दैनिक धूप घंटे",
         "sensor.daysPlanted": "रोपण के बाद दिन",
-        "sensor.predict": "वृद्धि का अनुमान लगाएं",
+        "sensor.predict": "विकास का अनुमान लगाएं",
+        "sensor.simulate": "विकास का अनुकरण करें",
         "sensor.autoFill": "स्वतः भरें",
         "prediction.success": "पूर्वानुमान सफल",
-        "prediction.error": "पूर्वानुमान विफल रहा"
+        "prediction.error": "पूर्वानुमान विफल रहा",
+        "history.title": "पूर्वानुमान इतिहास",
+        "history.days": "दिन",
+        "history.temperature": "तापमान",
+        "history.rainfall": "वर्षा",
+        "history.ph": "पीएच",
+        "history.sunlight": "धूप",
+        "history.height": "ऊंचाई (सेमी)",
+        "history.noData": "कोई पूर्वानुमान डेटा उपलब्ध नहीं है",
+        "history.clear": "साफ़ करें"
       }
     };
     
     // WebSocket connection parameters
-    const wsHost = "192.168.76.140";
-    const wsPort = "8765";
     let ws = null;
     let reconnectTimer = null;
     const reconnectInterval = 5000;
@@ -721,6 +809,11 @@
         currentLang = this.getAttribute('data-lang');
         localStorage.setItem('agrisense-lang', currentLang);
         document.documentElement.lang = currentLang;
+        if (currentLang === 'hi') {
+          document.body.classList.add('hindi');
+        } else {
+          document.body.classList.remove('hindi');
+        }
         translatePage();
         updateGrowthChart(); // Update chart labels
         
@@ -770,7 +863,7 @@
       
       try {
         // Create WebSocket connection to the server
-        ws = new WebSocket(`ws://${wsHost}:${wsPort}`);
+        ws = new WebSocket('ws://localhost:8765');
         
         // Connection opened handler
         ws.onopen = function(event) {
@@ -879,22 +972,23 @@
     function sendSensorData() {
       if (ws && ws.readyState === WebSocket.OPEN) {
         // Gather sensor data from form
-        const sensorData = {
-          "Temperature(C)": parseFloat(document.getElementById('Temperature(C)').value),
-          "Humidity(%)": parseFloat(document.getElementById('Humidity(%)').value),
-          "SoilMoisture(%)": parseFloat(document.getElementById('SoilMoisture(%)').value),
-          "LightIntensity(lux)": parseFloat(document.getElementById('LightIntensity(lux)').value),
-          "SoilpH": parseFloat(document.getElementById('SoilpH').value),
-          "DaysSincePlanting": parseInt(document.getElementById('DaysSincePlanting').value)
-        };
+        const form = document.getElementById('sensorForm');
+        const formData = {};
         
-        console.log("Sending sensor data:", sensorData);
+        // Get all form inputs with name attributes
+        Array.from(form.elements).forEach(element => {
+          if (element.name && element.name !== '') {
+            formData[element.name] = Number(element.value);
+          }
+        });
+        
+        console.log("Sending data:", formData);
         
         // Show loader
         showLoader();
         
         // Send data to server
-        ws.send(JSON.stringify(sensorData));
+        ws.send(JSON.stringify(formData));
         
         // Update last update time
         updateLastUpdateTime();
@@ -915,26 +1009,39 @@
       hideLoader();
       
       if (data.status === "success" && data.predicted_height_cm !== undefined) {
+        // Get form values for record keeping
+        const formData = {
+          days: parseInt(document.getElementById('DaysSincePlanting').value),
+          temperature: parseFloat(document.getElementById('Temperature').value),
+          rainfall: parseFloat(document.getElementById('Rainfall').value),
+          soilpH: parseFloat(document.getElementById('SoilpH').value),
+          sunlight: parseFloat(document.getElementById('SunlightHours').value),
+          height: data.predicted_height_cm
+        };
+        
         // Store prediction with timestamp
-        const currentDays = parseInt(document.getElementById('DaysSincePlanting').value);
         lastPrediction = {
-          height: data.predicted_height_cm,
-          days: currentDays,
+          ...formData,
           timestamp: new Date()
         };
         
         // Add to history if not duplicate
         if (predictionHistory.length === 0 || 
-            predictionHistory[predictionHistory.length - 1].days !== currentDays) {
+            predictionHistory[predictionHistory.length - 1].days !== formData.days) {
           predictionHistory.push(lastPrediction);
           
-          // Limit history size
-          if (predictionHistory.length > 20) {
-            predictionHistory.shift();
-          }
+          // Sort history by days
+          predictionHistory.sort((a, b) => a.days - b.days);
         } else {
           // Update last entry if same day
-          predictionHistory[predictionHistory.length - 1] = lastPrediction;
+          const index = predictionHistory.findIndex(p => p.days === formData.days);
+          if (index !== -1) {
+            predictionHistory[index] = lastPrediction;
+          } else {
+            predictionHistory.push(lastPrediction);
+            // Sort history by days
+            predictionHistory.sort((a, b) => a.days - b.days);
+          }
         }
         
         // Update UI with prediction
@@ -959,6 +1066,7 @@
       
       // Calculate growth rate if we have multiple predictions
       if (predictionHistory.length > 1) {
+        // Sort by days
         const sortedHistory = [...predictionHistory].sort((a, b) => a.days - b.days);
         const growthRates = [];
         
@@ -995,13 +1103,47 @@
           }
           
           // Update health status and recommendations
-          updateHealthStatus(healthStatus, "");
-          updateRecommendations(healthStatus, "", sortedHistory);
+          updateHealthStatus(healthStatus);
+          updateRecommendations(healthStatus);
         }
       }
       
+      // Update history table
+      updateHistoryTable();
+      
       // Generate and update chart
       updateGrowthChart();
+    }
+    
+    /**
+     * Update the history table with prediction data
+     */
+    function updateHistoryTable() {
+      const tableBody = document.getElementById('historyTableBody');
+      
+      // Clear table
+      tableBody.innerHTML = '';
+      
+      if (predictionHistory.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" data-i18n="history.noData">${getTranslation('history.noData')}</td></tr>`;
+        return;
+      }
+      
+      // Add rows for each prediction
+      predictionHistory.forEach(record => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+          <td>${record.days}</td>
+          <td>${record.temperature.toFixed(1)} °C</td>
+          <td>${record.rainfall.toFixed(1)} mm</td>
+          <td>${record.soilpH.toFixed(1)}</td>
+          <td>${record.sunlight.toFixed(1)} h</td>
+          <td><strong>${record.height.toFixed(2)}</strong></td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
     }
     
     /**
@@ -1169,15 +1311,14 @@
         // Update chart
         growthChart.data.labels = labels;
         growthChart.data.datasets[0].data = values;
+        growthChart.update();
       }
-      
-      growthChart.update();
     }
     
     /**
      * Update the health status display
      */
-    function updateHealthStatus(status, message) {
+    function updateHealthStatus(status) {
       const healthStatusDiv = document.getElementById('healthStatus');
       
       if (status.toLowerCase() === "sick") {
@@ -1225,7 +1366,7 @@
     /**
      * Generate recommendations based on plant status and growth
      */
-    function updateRecommendations(status, disease, predictions) {
+    function updateRecommendations(status) {
       const container = document.getElementById('recommendationsContainer');
       let recommendations = '<ul class="list-group list-group-flush">';
       
@@ -1324,19 +1465,25 @@
      */
     function autoFillSensorValues() {
       // Temperature between 20-30°C
-      document.getElementById('Temperature(C)').value = (Math.random() * 10 + 20).toFixed(1);
+      document.getElementById('Temperature').value = (Math.random() * 10 + 20).toFixed(1);
       
-      // Humidity between 50-80%
-      document.getElementById('Humidity(%)').value = (Math.random() * 30 + 50).toFixed(1);
-      
-      // Soil moisture between 30-70%
-      document.getElementById('SoilMoisture(%)').value = (Math.random() * 40 + 30).toFixed(1);
-      
-      // Light intensity between 4000-12000 lux
-      document.getElementById('LightIntensity(lux)').value = Math.floor(Math.random() * 8000 + 4000);
+      // Rainfall between 50-200 mm
+      document.getElementById('Rainfall').value = (Math.random() * 150 + 50).toFixed(1);
       
       // Soil pH between 5.5-7.5
       document.getElementById('SoilpH').value = (Math.random() * 2 + 5.5).toFixed(1);
+      
+      // Nitrogen between 60-120 mg/kg
+      document.getElementById('NitrogenLevel').value = Math.floor(Math.random() * 60 + 60);
+      
+      // Phosphorus between 30-70 mg/kg
+      document.getElementById('PhosphorusLevel').value = Math.floor(Math.random() * 40 + 30);
+      
+      // Potassium between 50-90 mg/kg
+      document.getElementById('PotassiumLevel').value = Math.floor(Math.random() * 40 + 50);
+      
+      // Sunlight between 8-16 hours
+      document.getElementById('SunlightHours').value = (Math.random() * 8 + 8).toFixed(1);
       
       // Keep the current days value or increment by a random amount between 1-7
       const currentDays = parseInt(document.getElementById('DaysSincePlanting').value);
@@ -1349,9 +1496,80 @@
       }
     }
     
+    /**
+     * Simulate growth over time with multiple predictions
+     */
+    function simulateGrowth() {
+      // Clear previous predictions if requested
+      if (confirm(currentLang === 'hi' ? "क्या आप वर्तमान पूर्वानुमान इतिहास को साफ़ करना चाहते हैं?" : "Do you want to clear the current prediction history?")) {
+        predictionHistory = [];
+        updateHistoryTable();
+      }
+      
+      // Get base values from form
+      const baseTemp = parseFloat(document.getElementById('Temperature').value);
+      const baseRain = parseFloat(document.getElementById('Rainfall').value);
+      const basePH = parseFloat(document.getElementById('SoilpH').value);
+      const nitrogen = parseFloat(document.getElementById('NitrogenLevel').value);
+      const phosphorus = parseFloat(document.getElementById('PhosphorusLevel').value);
+      const potassium = parseFloat(document.getElementById('PotassiumLevel').value);
+      const sunlight = parseFloat(document.getElementById('SunlightHours').value);
+      
+      // Define days to simulate
+      const days = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+      
+      // Show loader
+      showLoader();
+      
+      // Submit prediction for each day with a delay
+      let index = 0;
+      const simulateNext = () => {
+        if (index < days.length) {
+          // Update days input
+          document.getElementById('DaysSincePlanting').value = days[index];
+          
+          // Create prediction data
+          const predictionData = {
+            DaysSincePlanting: days[index],
+            Temperature: baseTemp,
+            Rainfall: baseRain,
+            SoilpH: basePH,
+            NitrogenLevel: nitrogen,
+            PhosphorusLevel: phosphorus,
+            PotassiumLevel: potassium,
+            SunlightHours: sunlight
+          };
+          
+          // Send to server
+          if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify(predictionData));
+            index++;
+            setTimeout(simulateNext, 1000); // Wait 1 second between predictions
+          } else {
+            // WebSocket not connected, try to reconnect
+            showNotification(getTranslation("status.disconnected"), "warning");
+            initWebSocket();
+            setTimeout(simulateNext, 2000); // Retry after 2 seconds
+          }
+        } else {
+          // Simulation complete
+          hideLoader();
+          showNotification(currentLang === 'hi' ? "सिमुलेशन पूरा हुआ" : "Simulation complete", "success");
+        }
+      };
+      
+      // Start simulation
+      simulateNext();
+    }
+    
     // Initialize the dashboard when the document is loaded
     document.addEventListener('DOMContentLoaded', function() {
-      console.log("Initializing Agrisense Dashboard...");
+      console.log("Initializing Corn Growth Predictor Dashboard...");
+      
+      // Apply Hindi class if needed
+      if (currentLang === 'hi') {
+        document.body.classList.add('hindi');
+      }
       
       // Initialize the chart
       initializeChart();
@@ -1370,6 +1588,11 @@
         autoFillSensorValues();
       });
       
+      // Add simulate button handler
+      document.getElementById('simulateBtn').addEventListener('click', function() {
+        simulateGrowth();
+      });
+      
       // Add refresh button handler
       document.getElementById('refreshButton').addEventListener('click', function() {
         if (lastPrediction) {
@@ -1383,6 +1606,26 @@
         } else {
           // No predictions yet, try to send sensor data
           sendSensorData();
+        }
+      });
+      
+      // Add clear history button handler
+      document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+        if (confirm(currentLang === 'hi' ? "क्या आप वाकई इतिहास को साफ़ करना चाहते हैं?" : "Are you sure you want to clear the history?")) {
+          predictionHistory = [];
+          lastPrediction = null;
+          updateHistoryTable();
+          updateGrowthChart();
+          
+          // Reset stats
+          document.getElementById('currentHeight').textContent = '--';
+          document.getElementById('predictedHeight').textContent = '--';
+          document.getElementById('growthRate').textContent = '--';
+          document.getElementById('heightTrend').innerHTML = '<i class="bi bi-arrow-up me-1"></i><span>--</span>';
+          
+          // Reset health status
+          updateHealthStatus('unknown');
+          updateRecommendations('unknown');
         }
       });
       
