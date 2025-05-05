@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌾 AgriSense – Intelligent Crop Observation & Forecast System
 
 AgriSense is a smart, innovative solution designed to cater to the diverse farming needs of individuals, small-scale farmers, and large-scale agricultural setups. By combining IoT and machine learning, AgriSense provides real-time insights into field conditions to help farmers maximize yield, detect crop diseases early, and optimize irrigation schedules.
@@ -87,4 +88,6 @@ If you find this project helpful, feel free to star ⭐ the repository, fork it,
 
 ---
 
+=======
+>>>>>>> d0e2b39fd99114fb7513f27753b904c2bcb8bb28
 
